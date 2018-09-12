@@ -38,22 +38,22 @@ class Zip
     std::shared_ptr<std::vector<std::string>> unzippedFiles() const;
 
     // zip
-    bool createZipFile(const std::string &filepath, bool append = false, const std::string &password = "");
-    bool addFileToZip(std::string &filepath, std::string &newname);
-    bool addDataToZip(std::vector<uint8_t> &data, std::string newname,
+    bool createZipFile(const std::string &filePath, bool append = false, const std::string &password = "");
+    bool addFileToZip(const std::string &filePath, const std::string &newName);
+    bool addDataToZip(std::shared_ptr<std::vector<uint8_t>> data, const std::string &newName,
                       std::chrono::system_clock::time_point created = std::chrono::system_clock::now());
     bool closeZipFile();
 
     // unzip
-    bool openUnzipFile(const std::string &filepath, const std::string &password = "");
-    bool unzipFiles(const std::string &targetpath, bool overwrite = false);
+    bool openUnzipFile(const std::string &filePath, const std::string &password = "");
+    bool unzipFiles(const std::string &targetPath, bool overwrite = false);
     bool closeUnzipFile();
 
   private:
     Zip(const Zip &other) = delete;
 
     std::string _password;
-    std::shared_ptr<std::vector<std::string>> _unzippedFiles{nullptr};
+    std::shared_ptr<std::vector<std::string>> _unzippedFiles;
 
     void *_zipFile{nullptr};
     void *_unzipFile{nullptr};
