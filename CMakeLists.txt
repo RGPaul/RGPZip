@@ -37,6 +37,9 @@ link_directories(${CMAKE_CURRENT_SOURCE_DIR}/deps/lib)
 find_package(zlib REQUIRED)
 
 # Boost - http://www.boost.org
+set(Boost_USE_STATIC_LIBS ON )
+set(Boost_USE_MULTITHREADED ON)
+set(Boost_USE_STATIC_RUNTIME ON)
 find_package(Boost 1.64.0 REQUIRED COMPONENTS system filesystem)
 
 # ----------------------------------------------------------------------------------------------------------------------
