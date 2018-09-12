@@ -1,6 +1,9 @@
 ### Custom ###
 
 deps/
+!deps/zlib
+!deps/include/.keep
+!deps/lib/.keep
 
 # Created by https://www.gitignore.io/api/windows,linux,macos,c++,cmake,clion,visualstudio,visualstudiocode
 
