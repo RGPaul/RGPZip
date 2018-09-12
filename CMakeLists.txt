@@ -36,6 +36,9 @@ link_directories(${CMAKE_CURRENT_SOURCE_DIR}/deps/lib)
 # zlibc Compressing File-I/O Library - https://www.zlib.net
 find_package(zlib REQUIRED)
 
+# Boost - http://www.boost.org
+find_package(Boost 1.64.0 REQUIRED COMPONENTS system filesystem)
+
 # ----------------------------------------------------------------------------------------------------------------------
 
 add_library(rgpzip STATIC
@@ -49,7 +52,12 @@ add_library(rgpzip STATIC
 
 target_include_directories(rgpzip
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/deps/zlib/contrib/minizip
-    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
+    PRIVATE ${Boost_INCLUDE_DIRS})
+
+target_link_libraries(rgpzip
+    ${ZLIB_LIBRARIES}
+    ${Boost_LIBRARIES})
 
 # set version info
 set_target_properties(rgpzip PROPERTIES

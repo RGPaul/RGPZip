@@ -46,7 +46,7 @@ class Zip
 
     // unzip
     bool openUnzipFile(const std::string &filePath, const std::string &password = "");
-    bool unzipFiles(const std::string &targetPath, bool overwrite = false);
+    bool unzipFiles(std::string targetPath, bool overwrite = false);
     bool closeUnzipFile();
 
   private:

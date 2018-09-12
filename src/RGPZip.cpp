@@ -25,6 +25,7 @@
 #include <ctime>
 #include <fstream>
 
+#include <boost/filesystem.hpp>
 #include <unzip.h>
 #include <zconf.h>
 #include <zip.h>
@@ -182,8 +183,161 @@ bool rgp::Zip::closeZipFile()
 // UNZIP Functions
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool rgp::Zip::openUnzipFile(const std::string &filePath, const std::string &password) {}
+bool rgp::Zip::openUnzipFile(const std::string &filePath, const std::string &password)
+{
+    _password = password;
 
-bool rgp::Zip::unzipFiles(const std::string &targetPath, bool overwrite) {}
+    _unzippedFiles = std::make_shared<std::vector<std::string>>();
 
-bool rgp::Zip::closeUnzipFile() {}
+    _unzipFile = unzOpen(filePath.c_str());
+
+    return _unzipFile != nullptr;
+}
+
+bool rgp::Zip::unzipFiles(std::string targetPath, bool overwrite)
+{
+    if (targetPath.empty() || _unzipFile == nullptr) {
+        return false;
+    }
+
+    // targetPath needs a trailing /
+    if (targetPath.back() != '/') {
+        targetPath.append("/");
+    }
+
+    bool success = true;
+
+    char buffer[4096] = {0};
+
+    const char *password = {nullptr};
+
+    if (!_password.empty()) {
+        password = _password.c_str();
+    }
+
+    if (unzGoToFirstFile(_unzipFile) != UNZ_OK) {
+        return false;
+    }
+
+    do  // we iterate over all files
+    {
+        // open current file
+        if (password != nullptr)
+        {
+            // we have a password - so we need to open with it
+            if (unzOpenCurrentFilePassword(_unzipFile, password) != UNZ_OK)
+            {
+                success = false;
+                break;
+            }
+        }
+        else
+        {
+            // we don't have a password - just open
+            if (unzOpenCurrentFile(_unzipFile) != UNZ_OK)
+            {
+                success = false;
+                break;
+            }
+        }
+
+        // reading file info
+        unz_file_info fileInfo;
+        if (unzGetCurrentFileInfo(_unzipFile, &fileInfo, nullptr, 0, nullptr, 0, nullptr, 0) != UNZ_OK)
+        {
+            success = false;
+            unzCloseCurrentFile(_unzipFile);
+            break;
+        }
+
+        // get filename from the fileInfo
+        char *cFileName = new char[fileInfo.size_filename + 1];
+        unzGetCurrentFileInfo(_unzipFile, &fileInfo, cFileName, fileInfo.size_filename + 1, nullptr, 0, nullptr, 0);
+        cFileName[fileInfo.size_filename] = '\0';
+
+        // check filename for paths
+        std::string fileName = cFileName;
+
+        delete[] cFileName;
+
+        // replace all '\' with '/'
+        unsigned long index;
+        while ((index = fileName.find_first_of('\\')) != std::string::npos)
+        {
+            fileName.replace(index, 1, "/");
+        }
+        std::string fullPath = targetPath + fileName;
+
+        // create directory / parent directories
+        index = fullPath.find_last_of('/');
+        if (index != std::string::npos)
+        {
+            boost::filesystem::path dir(fullPath.substr(0, index+1));
+            boost::filesystem::create_directories(dir);
+        }
+
+        std::shared_ptr<std::ofstream> fs;
+        int read = 0;
+        while ((read = unzReadCurrentFile(_unzipFile, buffer, 4096)) > 0)
+        {
+            if (!fs || !fs->is_open())
+            {
+                if (boost::filesystem::exists(fullPath) && !overwrite) {
+                    break;
+                }
+
+                fs = std::make_shared<std::ofstream>(fullPath, std::ios::binary | std::ios::trunc);
+
+                if (!fs->is_open()) {
+                    fs.reset();
+                    break;
+                }
+            }
+
+            fs->write(buffer, read);
+        }
+
+        // check if we got an error
+        if (read < 0) {
+            success = false;
+        }
+
+        if (fs)
+        {
+            fs->close();  // flush the data to the file
+            // we list all unzipped files
+            _unzippedFiles->push_back(fullPath);
+            fs.reset();
+        }
+
+        // we are done with the file -> close the file
+        if (unzCloseCurrentFile(_unzipFile) != UNZ_OK)
+        {
+            success = false;
+            break;
+        }
+
+    } // goto next file
+    while (unzGoToNextFile(_unzipFile) == UNZ_OK && success);
+
+    return success;
+}
+
+bool rgp::Zip::closeUnzipFile()
+{
+    _password.clear();
+
+    if (_unzipFile == nullptr)
+    {
+        return false;
+    }
+
+    if (unzClose(_unzipFile) != UNZ_OK)
+    {
+        _unzipFile = nullptr;
+        return false;
+    }
+
+    _unzipFile = nullptr;
+    return true;
+}
