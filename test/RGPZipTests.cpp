@@ -17,46 +17,53 @@
  COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
  OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  -----------------------------------------------------------------------------------------------------------------------
+*/
+
+/*
+ * The used image (golden-retriever-3058383_1920.jpg) for testing is licensed under CC0 and can be found on Pixabay:
+ * https://pixabay.com/de/golden-retiver-hund-happy-dog-3058383/
  */
 
-#pragma once
+// define the module name (prints at testing)
+#define BOOST_TEST_MODULE "RGPZip"
 
-#include <chrono>
-#include <memory>
+#include <rgpaul/RGPZip.hpp>
+using rgpaul::Zip;
+
 #include <string>
-#include <vector>
 
-namespace rgp
+// include this last
+#include <boost/test/included/unit_test.hpp>
+
+BOOST_AUTO_TEST_SUITE(RGPZip)
+
+BOOST_AUTO_TEST_CASE(constructor)
 {
-class Zip
+    BOOST_CHECK_NO_THROW(rgpaul::Zip {});
+}
+
+BOOST_AUTO_TEST_CASE(zip)
 {
-  public:
-    explicit Zip();
-    ~Zip();
+    rgpaul::Zip zipper {};
 
-    // accessors
-    std::shared_ptr<std::vector<std::string>> unzippedFiles() const;
+    BOOST_CHECK(zipper.createZipFile("Test.zip"));
 
-    // zip
-    bool createZipFile(const std::string &filePath, bool append = false, const std::string &password = "");
-    bool addFileToZip(const std::string &filePath, const std::string &newName);
-    bool addDataToZip(std::shared_ptr<std::vector<uint8_t>> data, const std::string &newName,
-                      std::chrono::system_clock::time_point created = std::chrono::system_clock::now());
-    bool closeZipFile();
+    BOOST_CHECK(zipper.addFileToZip("golden-retriever-3058383_1920.jpg", "Dog.jpg"));
 
-    // unzip
-    bool openUnzipFile(const std::string &filePath, const std::string &password = "");
-    bool unzipFiles(std::string targetPath, bool overwrite = false);
-    bool closeUnzipFile();
+    BOOST_CHECK(zipper.closeZipFile());
+}
 
-  private:
-    Zip(const Zip &other) = delete;
+BOOST_AUTO_TEST_CASE(unzip)
+{
+    rgpaul::Zip zipper {};
 
-    std::string _password;
-    std::shared_ptr<std::vector<std::string>> _unzippedFiles;
+    BOOST_CHECK(zipper.openUnzipFile("Test.zip"));
 
-    void *_zipFile{nullptr};
-    void *_unzipFile{nullptr};
-};
+    BOOST_CHECK(zipper.unzipFiles("test_output/files", true));
 
-}  // namespace rgp
+    // TODO: Check if the extracted image is equal to the original
+
+    BOOST_CHECK(zipper.closeUnzipFile());
+}
+
+BOOST_AUTO_TEST_SUITE_END()

@@ -40,8 +40,10 @@ find_package(zlib REQUIRED)
 set(Boost_USE_STATIC_LIBS ON )
 set(Boost_USE_MULTITHREADED ON)
 set(Boost_USE_STATIC_RUNTIME ON)
-find_package(Boost 1.64.0 REQUIRED COMPONENTS system filesystem)
+find_package(Boost 1.67.0 REQUIRED COMPONENTS system filesystem)
 
+# ----------------------------------------------------------------------------------------------------------------------
+# Library
 # ----------------------------------------------------------------------------------------------------------------------
 
 add_library(rgpzip STATIC
@@ -55,7 +57,7 @@ add_library(rgpzip STATIC
 
 target_include_directories(rgpzip
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/deps/zlib/contrib/minizip
-    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
+    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include
     PRIVATE ${Boost_INCLUDE_DIRS})
 
 target_link_libraries(rgpzip
@@ -66,11 +68,61 @@ target_link_libraries(rgpzip
 set_target_properties(rgpzip PROPERTIES
     VERSION 0.1
     SOVERSION 0
-    PUBLIC_HEADER "${CMAKE_CURRENT_SOURCE_DIR}/src/RGPZip.hpp")
+    PUBLIC_HEADER "include/rgpaul/RGPZip.hpp")
 
-# installation
+# ----------------------------------------------------------------------------------------------------------------------
+# Installation
+# ----------------------------------------------------------------------------------------------------------------------
+
 install(TARGETS rgpzip
     LIBRARY DESTINATION lib
     ARCHIVE DESTINATION lib
-    PUBLIC_HEADER DESTINATION include/rgp
+    PUBLIC_HEADER DESTINATION include/rgpaul
     RUNTIME DESTINATION bin)
+
+# ----------------------------------------------------------------------------------------------------------------------
+# Unit Tests
+# ----------------------------------------------------------------------------------------------------------------------
+
+# Boost Unit Tests
+find_package(Boost 1.67.0 COMPONENTS unit_test_framework)
+
+# only enable unit tests if the unit test framework was found
+if(Boost_UNIT_TEST_FRAMEWORK_FOUND)
+
+    # enable cmake testing
+    enable_testing()
+
+    # all tests are in the test folder
+    file(GLOB TEST_SRC RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} test/*.cpp)
+
+    # copy test data
+    file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/test/golden-retriever-3058383_1920.jpg DESTINATION .)
+
+    # process every test file
+    foreach(testSrc ${TEST_SRC})
+
+        # get the filename without the extension
+        get_filename_component(testname ${testSrc} NAME_WE)
+
+        # add test as executable
+        add_executable(${testname} ${testSrc})
+
+        # link jwtpp, boost and crypto++
+        target_link_libraries(${testname}
+            rgpzip
+            ${ZLIB_LIBRARIES}
+            ${Boost_LIBRARIES})
+
+        target_include_directories(${testname}
+                PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/deps/zlib/contrib/minizip
+                PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include
+                PRIVATE ${Boost_INCLUDE_DIRS})
+
+        # save the executable in the tests folder
+        set_target_properties(${testname} PROPERTIES RUNTIME_OUTPUT_DIRECTORY tests)
+
+        # add to cmake tests
+        add_test(NAME ${testname} COMMAND tests/${testname})
+    endforeach(testSrc)
+endif()

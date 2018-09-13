@@ -17,27 +17,27 @@
  COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
  OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  -----------------------------------------------------------------------------------------------------------------------
- */
+*/
 
-#include "RGPZip.hpp"
+#include <rgpaul/RGPZip.hpp>
 
 #include <sys/stat.h>
 #include <ctime>
 #include <fstream>
 
-#include <boost/filesystem.hpp>
 #include <unzip.h>
 #include <zconf.h>
 #include <zip.h>
 #include <zlib.h>
+#include <boost/filesystem.hpp>
 
 // ---------------------------------------------------------------------------------------------------------------------
 // Constructor / Destructor
 // ---------------------------------------------------------------------------------------------------------------------
 
-rgp::Zip::Zip() {}
+rgpaul::Zip::Zip() {}
 
-rgp::Zip::~Zip()
+rgpaul::Zip::~Zip()
 {
     // close any open files
     closeZipFile();
@@ -48,13 +48,13 @@ rgp::Zip::~Zip()
 // Accessors
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::shared_ptr<std::vector<std::string>> rgp::Zip::unzippedFiles() const { return _unzippedFiles; }
+std::shared_ptr<std::vector<std::string>> rgpaul::Zip::unzippedFiles() const { return _unzippedFiles; }
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ZIP Functions
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool rgp::Zip::createZipFile(const std::string &filepath, bool append, const std::string &password)
+bool rgpaul::Zip::createZipFile(const std::string &filepath, bool append, const std::string &password)
 {
     _password = password;
     int appendData = append ? APPEND_STATUS_ADDINZIP : APPEND_STATUS_CREATE;
@@ -64,7 +64,7 @@ bool rgp::Zip::createZipFile(const std::string &filepath, bool append, const std
     return _zipFile != nullptr;
 }
 
-bool rgp::Zip::addFileToZip(const std::string &filePath, const std::string &newName)
+bool rgpaul::Zip::addFileToZip(const std::string &filePath, const std::string &newName)
 {
     struct stat fileStat = {0};
     int status = ::stat(filePath.c_str(), &fileStat);
@@ -92,8 +92,8 @@ bool rgp::Zip::addFileToZip(const std::string &filePath, const std::string &newN
     return addDataToZip(data, newName, modifiedDate);
 }
 
-bool rgp::Zip::addDataToZip(std::shared_ptr<std::vector<uint8_t>> data, const std::string &newName,
-                            std::chrono::system_clock::time_point created)
+bool rgpaul::Zip::addDataToZip(std::shared_ptr<std::vector<uint8_t>> data, const std::string &newName,
+                               std::chrono::system_clock::time_point created)
 {
     if (data == nullptr || newName.empty() || _zipFile == nullptr)
     {
@@ -160,7 +160,7 @@ bool rgp::Zip::addDataToZip(std::shared_ptr<std::vector<uint8_t>> data, const st
     return zipCloseFileInZip(_zipFile) == Z_OK;
 }
 
-bool rgp::Zip::closeZipFile()
+bool rgpaul::Zip::closeZipFile()
 {
     _password.clear();
 
@@ -183,7 +183,7 @@ bool rgp::Zip::closeZipFile()
 // UNZIP Functions
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool rgp::Zip::openUnzipFile(const std::string &filePath, const std::string &password)
+bool rgpaul::Zip::openUnzipFile(const std::string &filePath, const std::string &password)
 {
     _password = password;
 
@@ -194,14 +194,16 @@ bool rgp::Zip::openUnzipFile(const std::string &filePath, const std::string &pas
     return _unzipFile != nullptr;
 }
 
-bool rgp::Zip::unzipFiles(std::string targetPath, bool overwrite)
+bool rgpaul::Zip::unzipFiles(std::string targetPath, bool overwrite)
 {
-    if (targetPath.empty() || _unzipFile == nullptr) {
+    if (targetPath.empty() || _unzipFile == nullptr)
+    {
         return false;
     }
 
     // targetPath needs a trailing /
-    if (targetPath.back() != '/') {
+    if (targetPath.back() != '/')
+    {
         targetPath.append("/");
     }
 
@@ -211,11 +213,13 @@ bool rgp::Zip::unzipFiles(std::string targetPath, bool overwrite)
 
     const char *password = {nullptr};
 
-    if (!_password.empty()) {
+    if (!_password.empty())
+    {
         password = _password.c_str();
     }
 
-    if (unzGoToFirstFile(_unzipFile) != UNZ_OK) {
+    if (unzGoToFirstFile(_unzipFile) != UNZ_OK)
+    {
         return false;
     }
 
@@ -272,7 +276,7 @@ bool rgp::Zip::unzipFiles(std::string targetPath, bool overwrite)
         index = fullPath.find_last_of('/');
         if (index != std::string::npos)
         {
-            boost::filesystem::path dir(fullPath.substr(0, index+1));
+            boost::filesystem::path dir(fullPath.substr(0, index + 1));
             boost::filesystem::create_directories(dir);
         }
 
@@ -282,13 +286,15 @@ bool rgp::Zip::unzipFiles(std::string targetPath, bool overwrite)
         {
             if (!fs || !fs->is_open())
             {
-                if (boost::filesystem::exists(fullPath) && !overwrite) {
+                if (boost::filesystem::exists(fullPath) && !overwrite)
+                {
                     break;
                 }
 
                 fs = std::make_shared<std::ofstream>(fullPath, std::ios::binary | std::ios::trunc);
 
-                if (!fs->is_open()) {
+                if (!fs->is_open())
+                {
                     fs.reset();
                     break;
                 }
@@ -298,7 +304,8 @@ bool rgp::Zip::unzipFiles(std::string targetPath, bool overwrite)
         }
 
         // check if we got an error
-        if (read < 0) {
+        if (read < 0)
+        {
             success = false;
         }
 
@@ -317,13 +324,13 @@ bool rgp::Zip::unzipFiles(std::string targetPath, bool overwrite)
             break;
         }
 
-    } // goto next file
+    }  // goto next file
     while (unzGoToNextFile(_unzipFile) == UNZ_OK && success);
 
     return success;
 }
 
-bool rgp::Zip::closeUnzipFile()
+bool rgpaul::Zip::closeUnzipFile()
 {
     _password.clear();
 
