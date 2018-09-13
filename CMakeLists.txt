@@ -91,7 +91,7 @@ install(TARGETS rgpzip
 find_package(Boost 1.67.0 COMPONENTS unit_test_framework)
 
 # only enable unit tests if the unit test framework was found
-if(Boost_UNIT_TEST_FRAMEWORK_FOUND)
+if(Boost_UNIT_TEST_FRAMEWORK_FOUND AND NOT IOS AND NOT ANDROID)
 
     # enable cmake testing
     enable_testing()
