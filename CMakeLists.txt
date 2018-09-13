@@ -37,7 +37,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Mo
 # ----------------------------------------------------------------------------------------------------------------------
 
 # zlibc Compressing File-I/O Library - https://www.zlib.net
-find_package(zlib REQUIRED)
+find_package(ZLIB REQUIRED)
 
 # Boost - http://www.boost.org
 set(Boost_USE_STATIC_LIBS ON )
