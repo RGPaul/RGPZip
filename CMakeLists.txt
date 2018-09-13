@@ -17,7 +17,7 @@
 #  OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #  ---------------------------------------------------------------------------------------------------------------------
 
-cmake_minimum_required (VERSION 3.10)
+cmake_minimum_required (VERSION 3.9)
 project (RGPZip)
 
 set(CMAKE_CXX_STANDARD 14)
