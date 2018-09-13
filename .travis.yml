@@ -15,6 +15,12 @@ branches:
 git:
     submodules: true
 
+before_install:
+  - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get install libboost-all-dev zlib1g-dev; fi
+  - if [ $TRAVIS_OS_NAME == linux ]; then sudo curl -L -o /root/cmake.sh https://cmake.org/files/v3.12/cmake-3.12.2-Linux-x86_64.sh; fi
+  - if [ $TRAVIS_OS_NAME == linux ]; then sudo chmod +x /root/cmake.sh; fi
+  - if [ $TRAVIS_OS_NAME == linux ]; then sudo sudo /root/cmake.sh --exclude-subdir --prefix=/usr; fi
+
 ### build matrix
 matrix:
   include:
@@ -30,10 +36,6 @@ matrix:
         sources: ['ubuntu-toolchain-r-test']
         packages: ['g++-5', 'ninja-build']
 
-install:
-  - if [ $TRAVIS_OS_NAME == linux ]; then apt-get install libboost-all-dev libz-dev; fi
-
-
 ### build script
 script:
   # show OS/compiler version
@@ -46,6 +48,7 @@ script:
   # Execute cmake
   - mkdir build
   - cd build
-  - cmake ..
+  - /usr/bin/cmake --version
+  - /usr/bin/cmake ..
   - make
   - make test
