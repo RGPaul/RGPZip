@@ -16,10 +16,19 @@ git:
     submodules: true
 
 before_install:
-  - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get install libboost-all-dev zlib1g-dev; fi
+  - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get install zlib1g-dev; fi
   - if [ $TRAVIS_OS_NAME == linux ]; then sudo curl -L -o /root/cmake.sh https://cmake.org/files/v3.12/cmake-3.12.2-Linux-x86_64.sh; fi
   - if [ $TRAVIS_OS_NAME == linux ]; then sudo chmod +x /root/cmake.sh; fi
-  - if [ $TRAVIS_OS_NAME == linux ]; then sudo sudo /root/cmake.sh --exclude-subdir --prefix=/usr; fi
+  - if [ $TRAVIS_OS_NAME == linux ]; then sudo /root/cmake.sh --exclude-subdir --prefix=/usr; fi
+  - if [ $TRAVIS_OS_NAME == linux ]; then curl -OL https://gist.githubusercontent.com/Manromen/4e4cf28ddf5bf2e4ee5cc2dfe4055952/raw/4e752a1edf816dccf9c464fe05a03d1ee3b52b6c/gDriveDownload.sh ; fi
+  - if [ $TRAVIS_OS_NAME == linux ]; then chmod +x gDriveDownload.sh; fi
+  - if [ $TRAVIS_OS_NAME == linux ]; then ./gDriveDownload.sh "1Z_bHUgDjVENLx5jjtD7OMgTafRuzT-zJ" ; fi
+  - if [ $TRAVIS_OS_NAME == linux ]; then pwd ; fi
+  - if [ $TRAVIS_OS_NAME == linux ]; then ls -lh ; fi
+  - if [ $TRAVIS_OS_NAME == linux ]; then unzip -o boost-ubuntu-trusty-1.68.0.zip -d deps/; fi
+  - if [ $TRAVIS_OS_NAME == linux ]; then ls -lh ; fi
+  - if [ $TRAVIS_OS_NAME == linux ]; then ls -lh deps; fi
+  - if [ $TRAVIS_OS_NAME == linux ]; then ls -lh deps/lib; fi
 
 ### build matrix
 matrix:
@@ -49,6 +58,6 @@ script:
   - mkdir build
   - cd build
   - /usr/bin/cmake --version
-  - /usr/bin/cmake ..
+  - /usr/bin/cmake "-DCMAKE_PREFIX_PATH=/home/travis/build/Manromen/RGPZip/deps" -DCMAKE_LIBRARY_PATH=/home/travis/build/Manromen/RGPZip/deps/lib/x86_64 ..
   - make
   - make test

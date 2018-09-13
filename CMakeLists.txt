@@ -69,7 +69,7 @@ target_link_libraries(rgpzip
 
 # set version info
 set_target_properties(rgpzip PROPERTIES
-    VERSION 1.0
+    VERSION 1.0.1
     SOVERSION 0
     PUBLIC_HEADER "include/rgpaul/RGPZip.hpp")
 
