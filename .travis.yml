@@ -1,0 +1,47 @@
+### project configuration
+
+# C++ project
+language: cpp
+
+# Use Ubuntu 14.04 (Trusty) 
+dist: trusty
+sudo: required
+group: edge
+
+branches:
+  only:
+    - master
+
+git:
+    submodules: true
+
+### build matrix
+matrix:
+  include:
+
+    # Linux / GCC
+    - os: linux
+      compiler: gcc
+      #env: 
+      #  - COMPILER=g++-5
+      #  - CXXFLAGS=-std=c++14
+      addons:
+      apt:
+        sources: ['ubuntu-toolchain-r-test']
+        packages: ['g++-5', 'ninja-build']
+
+### build script
+script:
+  # show OS/compiler version
+  - uname -a
+  - $CXX --version
+  
+  # make sure CXX is correctly set
+  - if [[ "${COMPILER}" != "" ]]; then export CXX=${COMPILER}; fi
+
+  # Execute cmake
+  - mkdir build
+  - cd build
+  - cmake ..
+  - make
+  - make test
