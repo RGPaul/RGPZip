@@ -21,6 +21,17 @@
 
 #pragma once
 
+// This is the global package copyright
+#define LIBRGPZIP_COPYRIGHT "2018 Ralph-Gordon Paul."
+
+// This is the version number of librgpzip
+#define LIBRGPZIP_VERSION "1.0"
+
+// The numeric version number is also available "in parts" by using these defines:
+#define LIBRGPZIP_VERSION_MAJOR 1
+#define LIBRGPZIP_VERSION_MINOR 0
+#define LIBRGPZIP_VERSION_PATCH 0
+
 #include <chrono>
 #include <memory>
 #include <string>

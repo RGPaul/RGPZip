@@ -29,6 +29,9 @@ include(CMakeToolsHelpers OPTIONAL)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/deps/include)
 link_directories(${CMAKE_CURRENT_SOURCE_DIR}/deps/lib)
 
+# add local cmake modules to module path
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules/")
+
 # ----------------------------------------------------------------------------------------------------------------------
 # Dependencies
 # ----------------------------------------------------------------------------------------------------------------------
@@ -66,7 +69,7 @@ target_link_libraries(rgpzip
 
 # set version info
 set_target_properties(rgpzip PROPERTIES
-    VERSION 0.1
+    VERSION 1.0
     SOVERSION 0
     PUBLIC_HEADER "include/rgpaul/RGPZip.hpp")
 
