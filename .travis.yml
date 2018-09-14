@@ -16,19 +16,35 @@ git:
     submodules: true
 
 before_install:
+  # Install Linux Dependencies (zlib, cmake, Google Drive Downloader)
   - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get install zlib1g-dev; fi
   - if [ $TRAVIS_OS_NAME == linux ]; then sudo curl -L -o /root/cmake.sh https://cmake.org/files/v3.12/cmake-3.12.2-Linux-x86_64.sh; fi
   - if [ $TRAVIS_OS_NAME == linux ]; then sudo chmod +x /root/cmake.sh; fi
   - if [ $TRAVIS_OS_NAME == linux ]; then sudo /root/cmake.sh --exclude-subdir --prefix=/usr; fi
-  - if [ $TRAVIS_OS_NAME == linux ]; then curl -OL https://gist.githubusercontent.com/Manromen/4e4cf28ddf5bf2e4ee5cc2dfe4055952/raw/4e752a1edf816dccf9c464fe05a03d1ee3b52b6c/gDriveDownload.sh ; fi
-  - if [ $TRAVIS_OS_NAME == linux ]; then chmod +x gDriveDownload.sh; fi
-  - if [ $TRAVIS_OS_NAME == linux ]; then ./gDriveDownload.sh "1Z_bHUgDjVENLx5jjtD7OMgTafRuzT-zJ" ; fi
-  - if [ $TRAVIS_OS_NAME == linux ]; then pwd ; fi
-  - if [ $TRAVIS_OS_NAME == linux ]; then ls -lh ; fi
-  - if [ $TRAVIS_OS_NAME == linux ]; then unzip -o boost-ubuntu-trusty-1.68.0.zip -d deps/; fi
-  - if [ $TRAVIS_OS_NAME == linux ]; then ls -lh ; fi
-  - if [ $TRAVIS_OS_NAME == linux ]; then ls -lh deps; fi
-  - if [ $TRAVIS_OS_NAME == linux ]; then ls -lh deps/lib; fi
+
+  # Download Google Drive Downloader
+  - curl -OL https://gist.githubusercontent.com/Manromen/4e4cf28ddf5bf2e4ee5cc2dfe4055952/raw/4e752a1edf816dccf9c464fe05a03d1ee3b52b6c/gDriveDownload.sh
+  - chmod +x gDriveDownload.sh;
+
+  # Install Android Boost from Google Drive
+  - if [ $TRAVIS_OS_NAME == linux ] && [ $TARGET_PLATFORM == android ]; then ./gDriveDownload.sh "1WwOce4Ci89f56a0UsvaRHS-8SpeARagj" ; fi
+  - if [ $TRAVIS_OS_NAME == linux ] && [ $TARGET_PLATFORM == android ]; then unzip -q -o boost-android-r17b-15-clang-1.68.0.zip -d deps/; fi
+
+  # Install iOS Boost and zlib from Google Drive
+  - if [ $TRAVIS_OS_NAME == osx ] && [ $TARGET_PLATFORM == ios ]; then ./gDriveDownload.sh "1ILxNcA5SS9_IVtHVMXsq6rmEUdVOsJ0w" ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] && [ $TARGET_PLATFORM == ios ]; then unzip -q -o boost-ios-sdk11.4-clang-1.68.0.zip -d deps/; fi
+  - if [ $TRAVIS_OS_NAME == osx ] && [ $TARGET_PLATFORM == ios ]; then curl -L -o zlib-1.2.11-ios-sdk11.4.zip https://drive.google.com/uc\?export\=download\&id\=1PWK67Q-dGGZ6GKx3qOCFw9toD7bLqmTr ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] && [ $TARGET_PLATFORM == ios ]; then unzip -o zlib-1.2.11-ios-sdk11.4.zip -d deps/; fi
+
+  # Install Linux Boost from Google Drive
+  - if [ $TRAVIS_OS_NAME == linux ] && [ $TARGET_PLATFORM == linux ]; then ./gDriveDownload.sh "1Z_bHUgDjVENLx5jjtD7OMgTafRuzT-zJ" ; fi
+  - if [ $TRAVIS_OS_NAME == linux ] && [ $TARGET_PLATFORM == linux ]; then unzip -q -o boost-ubuntu-trusty-1.68.0.zip -d deps/; fi
+
+  # Install macOS Boost and zlib from Google Drive
+  - if [ $TRAVIS_OS_NAME == osx ] && [ $TARGET_PLATFORM == osx ]; then ./gDriveDownload.sh "1HN3SLqjHDYP8G4QjIX92zB_tpBcAlgi-" ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] && [ $TARGET_PLATFORM == osx ]; then unzip -q -o boost-macos-sdk10.13-clang-1.68.0.zip -d deps/; fi
+  - if [ $TRAVIS_OS_NAME == osx ] && [ $TARGET_PLATFORM == osx ]; then curl -L -o zlib-1.2.11-macos.zip https://drive.google.com/uc\?export\=download\&id\=1Nt0jndWSv_hZujCBneGAuINrVAH7uNW2 ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] && [ $TARGET_PLATFORM == osx ]; then unzip -o zlib-1.2.11-macos.zip -d deps/; fi
 
 ### build matrix
 matrix:
@@ -37,27 +53,46 @@ matrix:
     # Linux / GCC
     - os: linux
       compiler: gcc
-      #env: 
-      #  - COMPILER=g++-5
-      #  - CXXFLAGS=-std=c++14
+      env:
+        - TARGET_PLATFORM=linux
       addons:
       apt:
         sources: ['ubuntu-toolchain-r-test']
         packages: ['g++-5', 'ninja-build']
 
+    # macOS
+    - os: osx
+      osx_image: xcode9.4
+      env:
+        - TARGET_PLATFORM=ios
+
 ### build script
 script:
   # show OS/compiler version
   - uname -a
-  - $CXX --version
-  
+
   # make sure CXX is correctly set
   - if [[ "${COMPILER}" != "" ]]; then export CXX=${COMPILER}; fi
 
-  # Execute cmake
-  - mkdir build
-  - cd build
-  - /usr/bin/cmake --version
-  - /usr/bin/cmake "-DCMAKE_PREFIX_PATH=/home/travis/build/Manromen/RGPZip/deps" -DCMAKE_LIBRARY_PATH=/home/travis/build/Manromen/RGPZip/deps/lib/x86_64 ..
+  # create build / install folder
+  - mkdir build; mkdir install; cd build
+
+  # Android build
+
+  # iOS build
+  - if [ $TRAVIS_OS_NAME == osx ] && [ $TARGET_PLATFORM == ios ]; then cmake  -DCMAKE_TOOLCHAIN_FILE="${TRAVIS_BUILD_DIR}/cmake/Toolchains/ios.toolchain.cmake" -DIOS_PLATFORM="OS" -DCMAKE_BUILD_TYPE=RELEASE -DCMAKE_INSTALL_PREFIX="${TRAVIS_BUILD_DIR}/install" -DCMAKE_PREFIX_PATH="${TRAVIS_BUILD_DIR}/deps" .. ; fi
+
+  # Linux build
+  - if [ $TRAVIS_OS_NAME == linux ] && [ $TARGET_PLATFORM == linux ]; then /usr/bin/cmake "-DCMAKE_PREFIX_PATH=${TRAVIS_BUILD_DIR}/deps" -DCMAKE_INSTALL_PREFIX="${TRAVIS_BUILD_DIR}/install" -DCMAKE_LIBRARY_PATH=${TRAVIS_BUILD_DIR}/deps/lib/x86_64 .. ; fi
+
+  # macOS build
+  - if [ $TRAVIS_OS_NAME == osx ] && [ $TARGET_PLATFORM == osx ]; then cmake "-DCMAKE_PREFIX_PATH=${TRAVIS_BUILD_DIR}/deps" -DCMAKE_INSTALL_PREFIX="${TRAVIS_BUILD_DIR}/install" .. ; fi
+
   - make
-  - make test
+  - make install
+  - if [ $TRAVIS_OS_NAME == linux ] && [ $TARGET_PLATFORM == linux ]; then make test; fi
+
+  # iOS ranlib
+  - if [ $TRAVIS_OS_NAME == osx ] && [ $TARGET_PLATFORM == ios ]; then xcrun ranlib "${TRAVIS_BUILD_DIR}/install/lib/*.a" || true ; fi
+
+  - ls -lh "${TRAVIS_BUILD_DIR}/install"
