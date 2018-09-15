@@ -1,0 +1,28 @@
+version: '{build}'
+
+image: Visual Studio 2017
+
+environment:
+  matrix:
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
+      platform: x64
+      FLAGS: ""
+
+init:
+  - cmake --version
+  - msbuild /version
+  # set protocol to tls version 1.2
+  - ps: '[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12'
+  # download google drive downloader script
+  - ps: 'Invoke-WebRequest -Uri "https://gist.githubusercontent.com/Manromen/f1a306097d46a69a09c25ca34b79a804/raw/6dd8c29d719da3e33d19df028972e86ddcfd6e5f/googleDriveDownload.ps1" -OutFile "googleDriveDownload.ps1"'
+
+  # Download boost for windows
+  - ps: '& "./googleDriveDownload.ps1" -GoogleFileId 13V9TzP7JUaF6EkIUpXbg6CM1T71OmUGg -FileDestination "boost-win10-msvc14.1-mt-s-1.68.0.zip"'
+
+build_script:
+#  - ps: 
+
+artifacts:
+  - path: rgpzip-win10-*.zip
+    name: RGPZip-Win10
+    type: zip
