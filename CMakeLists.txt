@@ -32,6 +32,14 @@ link_directories(${CMAKE_CURRENT_SOURCE_DIR}/deps/lib)
 # add local cmake modules to module path
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules/")
 
+# specify windows specific settings
+if (WIN32)
+    if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+        set(CMAKE_CXX_FLAGS_RELEASE "/MT")
+        set(CMAKE_CXX_FLAGS_DEBUG "/MTd")
+    endif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+endif (WIN32)
+
 # ----------------------------------------------------------------------------------------------------------------------
 # Dependencies
 # ----------------------------------------------------------------------------------------------------------------------
