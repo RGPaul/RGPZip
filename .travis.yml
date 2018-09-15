@@ -27,27 +27,27 @@ before_install:
   - if [ $TRAVIS_OS_NAME == linux ]; then sudo /root/cmake.sh --exclude-subdir --prefix=/usr; fi
 
   # Download Google Drive Downloader
-  - curl -OL https://gist.githubusercontent.com/Manromen/4e4cf28ddf5bf2e4ee5cc2dfe4055952/raw/4e752a1edf816dccf9c464fe05a03d1ee3b52b6c/gDriveDownload.sh
-  - chmod +x gDriveDownload.sh;
+  - curl -OL https://gist.githubusercontent.com/Manromen/4e4cf28ddf5bf2e4ee5cc2dfe4055952/raw/77d59731d3523f51d312254c6fd36427b3ea49b5/googleDriveDownload.sh
+  - chmod +x googleDriveDownload.sh;
 
   # Install Android Boost / NDK from Google Drive
-  - if [ $TRAVIS_OS_NAME == linux ] && [ $TARGET_PLATFORM == android ]; then ./gDriveDownload.sh "1WwOce4Ci89f56a0UsvaRHS-8SpeARagj" ; fi
+  - if [ $TRAVIS_OS_NAME == linux ] && [ $TARGET_PLATFORM == android ]; then ./googleDriveDownload.sh "1WwOce4Ci89f56a0UsvaRHS-8SpeARagj" ; fi
   - if [ $TRAVIS_OS_NAME == linux ] && [ $TARGET_PLATFORM == android ]; then unzip -q -o boost-android-r17b-15-clang-1.68.0.zip -d deps/; fi
-  - if [ $TRAVIS_OS_NAME == linux ] && [ $TARGET_PLATFORM == android ]; then ./gDriveDownload.sh "1TC5k_qcdZthAjLZOZG50iYdvzHO0n8ck" ; fi
+  - if [ $TRAVIS_OS_NAME == linux ] && [ $TARGET_PLATFORM == android ]; then ./googleDriveDownload.sh "1TC5k_qcdZthAjLZOZG50iYdvzHO0n8ck" ; fi
   - if [ $TRAVIS_OS_NAME == linux ] && [ $TARGET_PLATFORM == android ]; then unzip -q -o android-ndk-r17b-linux-x86_64.zip ; fi
 
   # Install iOS Boost and zlib from Google Drive
-  - if [ $TRAVIS_OS_NAME == osx ] && [ $TARGET_PLATFORM == ios ]; then ./gDriveDownload.sh "1ILxNcA5SS9_IVtHVMXsq6rmEUdVOsJ0w" ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] && [ $TARGET_PLATFORM == ios ]; then ./googleDriveDownload.sh "1ILxNcA5SS9_IVtHVMXsq6rmEUdVOsJ0w" ; fi
   - if [ $TRAVIS_OS_NAME == osx ] && [ $TARGET_PLATFORM == ios ]; then unzip -q -o boost-ios-sdk11.4-clang-1.68.0.zip -d deps/; fi
   - if [ $TRAVIS_OS_NAME == osx ] && [ $TARGET_PLATFORM == ios ]; then curl -L -o zlib-1.2.11-ios-sdk11.4.zip https://drive.google.com/uc\?export\=download\&id\=1PWK67Q-dGGZ6GKx3qOCFw9toD7bLqmTr ; fi
   - if [ $TRAVIS_OS_NAME == osx ] && [ $TARGET_PLATFORM == ios ]; then unzip -o zlib-1.2.11-ios-sdk11.4.zip -d deps/; fi
 
   # Install Linux Boost from Google Drive
-  - if [ $TRAVIS_OS_NAME == linux ] && [ $TARGET_PLATFORM == linux ]; then ./gDriveDownload.sh "1Z_bHUgDjVENLx5jjtD7OMgTafRuzT-zJ" ; fi
+  - if [ $TRAVIS_OS_NAME == linux ] && [ $TARGET_PLATFORM == linux ]; then ./googleDriveDownload.sh "1Z_bHUgDjVENLx5jjtD7OMgTafRuzT-zJ" ; fi
   - if [ $TRAVIS_OS_NAME == linux ] && [ $TARGET_PLATFORM == linux ]; then unzip -q -o boost-ubuntu-trusty-1.68.0.zip -d deps/; fi
 
   # Install macOS Boost and zlib from Google Drive
-  - if [ $TRAVIS_OS_NAME == osx ] && [ $TARGET_PLATFORM == osx ]; then ./gDriveDownload.sh "1HN3SLqjHDYP8G4QjIX92zB_tpBcAlgi-" ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] && [ $TARGET_PLATFORM == osx ]; then ./googleDriveDownload.sh "1HN3SLqjHDYP8G4QjIX92zB_tpBcAlgi-" ; fi
   - if [ $TRAVIS_OS_NAME == osx ] && [ $TARGET_PLATFORM == osx ]; then unzip -q -o boost-macos-sdk10.13-clang-1.68.0.zip -d deps/; fi
   - if [ $TRAVIS_OS_NAME == osx ] && [ $TARGET_PLATFORM == osx ]; then curl -L -o zlib-1.2.11-macos.zip https://drive.google.com/uc\?export\=download\&id\=1Nt0jndWSv_hZujCBneGAuINrVAH7uNW2 ; fi
   - if [ $TRAVIS_OS_NAME == osx ] && [ $TARGET_PLATFORM == osx ]; then unzip -o zlib-1.2.11-macos.zip -d deps/; fi
