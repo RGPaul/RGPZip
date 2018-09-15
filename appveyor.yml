@@ -13,24 +13,25 @@ init:
   - msbuild /version
 
 install:
+  # get submodules
+  - git submodule update --init --recursive
+
   # set protocol to tls version 1.2
   - ps: '[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12'
   # download google drive downloader script
   - ps: Invoke-WebRequest -Uri "https://gist.githubusercontent.com/Manromen/f1a306097d46a69a09c25ca34b79a804/raw/6dd8c29d719da3e33d19df028972e86ddcfd6e5f/googleDriveDownload.ps1" -OutFile "googleDriveDownload.ps1"
 
-  # Download boost for windows
+  # download boost for windows
   - ps: '& "./googleDriveDownload.ps1" -GoogleFileId 13V9TzP7JUaF6EkIUpXbg6CM1T71OmUGg -FileDestination "boost-win10-msvc14.1-mt-s-1.68.0.zip"'
   - ps: Expand-Archive -LiteralPath "boost-win10-msvc14.1-mt-s-1.68.0.zip" –DestinationPath "./deps"
 
-  # Download zlib for windows
+  # download zlib for windows
   - ps: '& "./googleDriveDownload.ps1" -GoogleFileId 15Z1J96itQI0NFLWu1fz-OLMMCc58_eAb -FileDestination "zlib-win10-1.2.11.zip"'
   - ps: Expand-Archive -LiteralPath "zlib-win10-1.2.11.zip" –DestinationPath "./deps"
 
-  - ps: Get-ChildItem -Path ./deps/lib/x86
-
 build_script:
   # cmake / build / install
-  - ps: cmake -G "Visual Studio 15 2017" "-DCMAKE_BUILD_TYPE=RELEASE" "-DCMAKE_PREFIX_PATH=${APPVEYOR_BUILD_FOLDER}/deps" "-DCMAKE_INSTALL_PREFIX=${APPVEYOR_BUILD_FOLDER}/install" .
+  - ps: cmake -G "Visual Studio 15 2017" "-DCMAKE_BUILD_TYPE=RELEASE" "-DCMAKE_PREFIX_PATH=${env:APPVEYOR_BUILD_FOLDER}/deps" "-DCMAKE_LIBRARY_PATH=${env:APPVEYOR_BUILD_FOLDER}/deps/lib/x86" "-DCMAKE_INSTALL_PREFIX=${env:APPVEYOR_BUILD_FOLDER}/install" .
   - ps: cmake --build . --target INSTALL --config Release
 
 artifacts:
