@@ -47,14 +47,21 @@ before_install:
   - if [ $TRAVIS_OS_NAME == linux ] && [ $TARGET_PLATFORM == linux ]; then unzip -q -o boost-ubuntu-trusty-1.68.0.zip -d deps/; fi
 
   # Install macOS Boost and zlib from Google Drive
-  - if [ $TRAVIS_OS_NAME == osx ] && [ $TARGET_PLATFORM == osx ]; then ./googleDriveDownload.sh "1HN3SLqjHDYP8G4QjIX92zB_tpBcAlgi-" ; fi
-  - if [ $TRAVIS_OS_NAME == osx ] && [ $TARGET_PLATFORM == osx ]; then unzip -q -o boost-macos-sdk10.13-clang-1.68.0.zip -d deps/; fi
-  - if [ $TRAVIS_OS_NAME == osx ] && [ $TARGET_PLATFORM == osx ]; then curl -L -o zlib-1.2.11-macos.zip https://drive.google.com/uc\?export\=download\&id\=1Nt0jndWSv_hZujCBneGAuINrVAH7uNW2 ; fi
-  - if [ $TRAVIS_OS_NAME == osx ] && [ $TARGET_PLATFORM == osx ]; then unzip -o zlib-1.2.11-macos.zip -d deps/; fi
+  - if [ $TRAVIS_OS_NAME == osx ] && [ $TARGET_PLATFORM == macos ]; then ./googleDriveDownload.sh "1HN3SLqjHDYP8G4QjIX92zB_tpBcAlgi-" ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] && [ $TARGET_PLATFORM == macos ]; then unzip -q -o boost-macos-sdk10.13-clang-1.68.0.zip -d deps/; fi
+  - if [ $TRAVIS_OS_NAME == osx ] && [ $TARGET_PLATFORM == macos ]; then curl -L -o zlib-1.2.11-macos.zip https://drive.google.com/uc\?export\=download\&id\=1Nt0jndWSv_hZujCBneGAuINrVAH7uNW2 ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] && [ $TARGET_PLATFORM == macos ]; then unzip -o zlib-1.2.11-macos.zip -d deps/; fi
 
 ### build matrix
 matrix:
   include:
+
+    # macOS
+    - os: osx
+      osx_image: xcode9.4
+      compiler: clang
+      env:
+        - TARGET_PLATFORM=macos
 
     # Linux / GCC
     - os: linux
@@ -66,12 +73,14 @@ matrix:
         sources: ['ubuntu-toolchain-r-test']
         packages: ['g++-5', 'ninja-build']
 
-    # macOS
+    # iOS
     - os: osx
       osx_image: xcode9.4
       compiler: clang
       env:
         - TARGET_PLATFORM=ios
+
+
 
     # Android / clang
     #- os: linux
@@ -129,10 +138,10 @@ script:
   - if [ $TRAVIS_OS_NAME == linux ] && [ $TARGET_PLATFORM == linux ]; then make test ; fi
 
   # macOS build
-  - if [ $TRAVIS_OS_NAME == osx ] && [ $TARGET_PLATFORM == osx ]; then cmake "-DCMAKE_PREFIX_PATH=${TRAVIS_BUILD_DIR}/deps" -DCMAKE_INSTALL_PREFIX="${TRAVIS_BUILD_DIR}/install" .. ; fi
-  - if [ $TRAVIS_OS_NAME == osx ] && [ $TARGET_PLATFORM == osx ]; then make ; fi
-  - if [ $TRAVIS_OS_NAME == osx ] && [ $TARGET_PLATFORM == osx ]; then make install ; fi
-  - if [ $TRAVIS_OS_NAME == osx ] && [ $TARGET_PLATFORM == osx ]; then make test ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] && [ $TARGET_PLATFORM == macos ]; then cmake "-DCMAKE_PREFIX_PATH=${TRAVIS_BUILD_DIR}/deps" -DCMAKE_INSTALL_PREFIX="${TRAVIS_BUILD_DIR}/install" .. ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] && [ $TARGET_PLATFORM == macos ]; then make ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] && [ $TARGET_PLATFORM == macos ]; then make install ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] && [ $TARGET_PLATFORM == macos ]; then make test ; fi
 
   # iOS ranlib
   - if [ $TRAVIS_OS_NAME == osx ] && [ $TARGET_PLATFORM == ios ]; then xcrun ranlib "${TRAVIS_BUILD_DIR}/install/lib/*.a" || true ; fi
