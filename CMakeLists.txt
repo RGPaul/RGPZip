@@ -57,14 +57,27 @@ find_package(Boost 1.67.0 REQUIRED COMPONENTS system filesystem)
 # Library
 # ----------------------------------------------------------------------------------------------------------------------
 
-add_library(rgpzip STATIC
-    # minizip sources
+file(GLOB MINIZIP_SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/deps/zlib/contrib/minizip/unzip.c
     ${CMAKE_CURRENT_SOURCE_DIR}/deps/zlib/contrib/minizip/zip.c
     ${CMAKE_CURRENT_SOURCE_DIR}/deps/zlib/contrib/minizip/ioapi.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/deps/zlib/contrib/minizip/mztools.c
-    # rgpzip sources
+    ${CMAKE_CURRENT_SOURCE_DIR}/deps/zlib/contrib/minizip/mztools.c)
+
+file(GLOB RGPZIP_SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/RGPZip.cpp)
+
+if (WIN32)
+    file(GLOB MINIZIP_PLATFORM_SRC
+            ${CMAKE_CURRENT_SOURCE_DIR}/deps/zlib/contrib/minizip/iowin32.c)
+endif (WIN32)
+
+add_library(rgpzip STATIC
+    # minizip sources
+    ${MINIZIP_SRC}
+    # platform specific minizip sources
+    ${MINIZIP_PLATFORM_SRC}
+    # rgpzip sources
+    ${RGPZIP_SRC})
 
 target_include_directories(rgpzip
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/deps/zlib/contrib/minizip
