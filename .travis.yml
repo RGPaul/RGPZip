@@ -20,6 +20,12 @@ before_install:
   # Get version from git tag
   - export TRAVIS_TAG=$(git describe --abbrev=0 --tags)
 
+  # define PLATFORM_ARTIFACT_NAME depending on TARGET_PLATFORM
+  - if [ $TARGET_PLATFORM == android ]; then export PLATFORM_ARTIFACT_NAME=android-${TRAVIS_ANDROID_NDK_VERSION}-${TRAVIS_ANDROID_NDK_TOOLCHAIN_VERSION} ; fi
+  - if [ $TARGET_PLATFORM == ios ]; then export PLATFORM_ARTIFACT_NAME=ios-sdk$(xcodebuild -showsdks | grep iphoneos | awk '{print $4}' | sed 's/[^0-9,\.]*//g') ; fi
+  - if [ $TARGET_PLATFORM == linux ]; then export PLATFORM_ARTIFACT_NAME=ubuntu-trusty ; fi
+  - if [ $TARGET_PLATFORM == macos ]; then export PLATFORM_ARTIFACT_NAME=macos-sdk$(xcodebuild -showsdks | grep macosx | awk '{print $4}' | sed 's/[^0-9,\.]*//g') ; fi
+
   # Install Linux Dependencies (zlib, cmake, Google Drive Downloader)
   - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get install zlib1g-dev; fi
   - if [ $TRAVIS_OS_NAME == linux ]; then sudo curl -L -o /root/cmake.sh https://cmake.org/files/v3.12/cmake-3.12.2-Linux-x86_64.sh; fi
@@ -31,28 +37,28 @@ before_install:
   - chmod +x googleDriveDownload.sh;
 
   # Install Android Boost / NDK / zlib from Google Drive
-  - if [ $TRAVIS_OS_NAME == linux ] && [ $TARGET_PLATFORM == android ]; then ./googleDriveDownload.sh "1WwOce4Ci89f56a0UsvaRHS-8SpeARagj" ; fi
-  - if [ $TRAVIS_OS_NAME == linux ] && [ $TARGET_PLATFORM == android ]; then unzip -q -o boost-android-r17b-15-clang-1.68.0.zip -d deps/; fi
+  - if [ $TARGET_PLATFORM == android ]; then ./googleDriveDownload.sh "1WwOce4Ci89f56a0UsvaRHS-8SpeARagj" ; fi
+  - if [ $TARGET_PLATFORM == android ]; then unzip -q -o boost-android-r17b-15-clang-1.68.0.zip -d deps/; fi
   - if [ $TRAVIS_OS_NAME == linux ] && [ $TARGET_PLATFORM == android ]; then ./googleDriveDownload.sh "1TC5k_qcdZthAjLZOZG50iYdvzHO0n8ck" ; fi
   - if [ $TRAVIS_OS_NAME == linux ] && [ $TARGET_PLATFORM == android ]; then unzip -q -o android-ndk-r17b-linux-x86_64.zip ; fi
-  - if [ $TRAVIS_OS_NAME == linux ] && [ $TARGET_PLATFORM == android ]; then curl -L -o zlib-android-1.2.11.zip https://drive.google.com/uc\?export\=download\&id\=1f0PVBzzGDum88JvDaJa3WhS48PDTfksH ; fi
-  - if [ $TRAVIS_OS_NAME == linux ] && [ $TARGET_PLATFORM == android ]; then unzip -o zlib-android-1.2.11.zip -d deps/; fi
+  - if [ $TARGET_PLATFORM == android ]; then curl -L -o zlib-android-1.2.11.zip https://drive.google.com/uc\?export\=download\&id\=1f0PVBzzGDum88JvDaJa3WhS48PDTfksH ; fi
+  - if [ $TARGET_PLATFORM == android ]; then unzip -o zlib-android-1.2.11.zip -d deps/; fi
 
   # Install iOS Boost and zlib from Google Drive
-  - if [ $TRAVIS_OS_NAME == osx ] && [ $TARGET_PLATFORM == ios ]; then ./googleDriveDownload.sh "1ILxNcA5SS9_IVtHVMXsq6rmEUdVOsJ0w" ; fi
-  - if [ $TRAVIS_OS_NAME == osx ] && [ $TARGET_PLATFORM == ios ]; then unzip -q -o boost-ios-sdk11.4-clang-1.68.0.zip -d deps/; fi
-  - if [ $TRAVIS_OS_NAME == osx ] && [ $TARGET_PLATFORM == ios ]; then curl -L -o zlib-1.2.11-ios-sdk11.4.zip https://drive.google.com/uc\?export\=download\&id\=1PWK67Q-dGGZ6GKx3qOCFw9toD7bLqmTr ; fi
-  - if [ $TRAVIS_OS_NAME == osx ] && [ $TARGET_PLATFORM == ios ]; then unzip -o zlib-1.2.11-ios-sdk11.4.zip -d deps/; fi
+  - if [ $TARGET_PLATFORM == ios ]; then ./googleDriveDownload.sh "1ILxNcA5SS9_IVtHVMXsq6rmEUdVOsJ0w" ; fi
+  - if [ $TARGET_PLATFORM == ios ]; then unzip -q -o boost-ios-sdk11.4-clang-1.68.0.zip -d deps/; fi
+  - if [ $TARGET_PLATFORM == ios ]; then curl -L -o zlib-1.2.11-ios-sdk11.4.zip https://drive.google.com/uc\?export\=download\&id\=1PWK67Q-dGGZ6GKx3qOCFw9toD7bLqmTr ; fi
+  - if [ $TARGET_PLATFORM == ios ]; then unzip -o zlib-1.2.11-ios-sdk11.4.zip -d deps/; fi
 
   # Install Linux Boost from Google Drive
-  - if [ $TRAVIS_OS_NAME == linux ] && [ $TARGET_PLATFORM == linux ]; then ./googleDriveDownload.sh "1Z_bHUgDjVENLx5jjtD7OMgTafRuzT-zJ" ; fi
-  - if [ $TRAVIS_OS_NAME == linux ] && [ $TARGET_PLATFORM == linux ]; then unzip -q -o boost-ubuntu-trusty-1.68.0.zip -d deps/; fi
+  - if [ $TARGET_PLATFORM == linux ]; then ./googleDriveDownload.sh "1Z_bHUgDjVENLx5jjtD7OMgTafRuzT-zJ" ; fi
+  - if [ $TARGET_PLATFORM == linux ]; then unzip -q -o boost-ubuntu-trusty-1.68.0.zip -d deps/; fi
 
   # Install macOS Boost and zlib from Google Drive
-  - if [ $TRAVIS_OS_NAME == osx ] && [ $TARGET_PLATFORM == macos ]; then ./googleDriveDownload.sh "1HN3SLqjHDYP8G4QjIX92zB_tpBcAlgi-" ; fi
-  - if [ $TRAVIS_OS_NAME == osx ] && [ $TARGET_PLATFORM == macos ]; then unzip -q -o boost-macos-sdk10.13-clang-1.68.0.zip -d deps/; fi
-  - if [ $TRAVIS_OS_NAME == osx ] && [ $TARGET_PLATFORM == macos ]; then curl -L -o zlib-1.2.11-macos.zip https://drive.google.com/uc\?export\=download\&id\=1Nt0jndWSv_hZujCBneGAuINrVAH7uNW2 ; fi
-  - if [ $TRAVIS_OS_NAME == osx ] && [ $TARGET_PLATFORM == macos ]; then unzip -o zlib-1.2.11-macos.zip -d deps/; fi
+  - if [ $TARGET_PLATFORM == macos ]; then ./googleDriveDownload.sh "1HN3SLqjHDYP8G4QjIX92zB_tpBcAlgi-" ; fi
+  - if [ $TARGET_PLATFORM == macos ]; then unzip -q -o boost-macos-sdk10.13-clang-1.68.0.zip -d deps/; fi
+  - if [ $TARGET_PLATFORM == macos ]; then curl -L -o zlib-1.2.11-macos.zip https://drive.google.com/uc\?export\=download\&id\=1Nt0jndWSv_hZujCBneGAuINrVAH7uNW2 ; fi
+  - if [ $TARGET_PLATFORM == macos ]; then unzip -o zlib-1.2.11-macos.zip -d deps/; fi
 
 ### build matrix
 matrix:
@@ -60,10 +66,12 @@ matrix:
 
     # Android / clang
     - os: linux
-      compiler: clang
       env:
         - TARGET_PLATFORM=android
-        - NDK_VERSION=r17b
+        - TRAVIS_ANDROID_NDK_VERSION=r17b
+        - TRAVIS_ANDROID_NDK_TOOLCHAIN_VERSION=clang
+        - TRAVIS_ANDROID_STL_TYPE=c++_static
+        #- PLATFORM_ARTIFACT_NAME=android-r17b-clang
       addons:
       apt:
         sources: ['ubuntu-toolchain-r-test']
@@ -75,12 +83,14 @@ matrix:
       compiler: clang
       env:
         - TARGET_PLATFORM=ios
+        #- PLATFORM_ARTIFACT_NAME=ios-sdk$(xcodebuild -showsdks | grep iphoneos | awk '{print $4}' | sed 's/[^0-9,\.]*//g')
 
     # Linux / GCC
     - os: linux
       compiler: gcc
       env:
         - TARGET_PLATFORM=linux
+        #- PLATFORM_ARTIFACT_NAME=ubuntu-trusty
       addons:
       apt:
         sources: ['ubuntu-toolchain-r-test']
@@ -92,6 +102,7 @@ matrix:
       compiler: clang
       env:
         - TARGET_PLATFORM=macos
+        #- PLATFORM_ARTIFACT_NAME=macos-sdk$(xcodebuild -showsdks | grep macosx | awk '{print $4}' | sed 's/[^0-9,\.]*//g')
 
 ### build script
 script:
@@ -106,56 +117,57 @@ script:
 
   # Android build
   # API 19 ARCH armeabi-v7a
-  - if [ $TRAVIS_OS_NAME == linux ] && [ $TARGET_PLATFORM == android ]; then /usr/bin/cmake -DCMAKE_SYSTEM_NAME=Android -DCMAKE_SYSTEM_VERSION=19 -DCMAKE_ANDROID_NDK=${TRAVIS_BUILD_DIR}/android-ndk-${NDK_VERSION} -DCMAKE_ANDROID_NDK_TOOLCHAIN_VERSION=clang -DCMAKE_ANDROID_ARCH_ABI=armeabi-v7a -DCMAKE_ANDROID_STL_TYPE=c++_static -DCMAKE_BUILD_TYPE=RELEASE -DCMAKE_PREFIX_PATH=${TRAVIS_BUILD_DIR}/deps -DCMAKE_LIBRARY_PATH=${TRAVIS_BUILD_DIR}/deps/lib/armeabi-v7a -DCMAKE_INSTALL_PREFIX="${TRAVIS_BUILD_DIR}/install/armeabi-v7a" .. ; fi
-  - if [ $TRAVIS_OS_NAME == linux ] && [ $TARGET_PLATFORM == android ]; then make install ; fi
-  - if [ $TRAVIS_OS_NAME == linux ] && [ $TARGET_PLATFORM == android ]; then mv ${TRAVIS_BUILD_DIR}/install/armeabi-v7a/lib ${TRAVIS_BUILD_DIR}/install/lib/armeabi-v7a ; fi
-  - if [ $TRAVIS_OS_NAME == linux ] && [ $TARGET_PLATFORM == android ]; then mv ${TRAVIS_BUILD_DIR}/install/armeabi-v7a/include ${TRAVIS_BUILD_DIR}/install/ ; fi
-  - if [ $TRAVIS_OS_NAME == linux ] && [ $TARGET_PLATFORM == android ]; then rm -rf * ; fi
+  - if [ $TARGET_PLATFORM == android ]; then /usr/bin/cmake -DCMAKE_SYSTEM_NAME=Android -DCMAKE_SYSTEM_VERSION=19 -DCMAKE_ANDROID_NDK=${TRAVIS_BUILD_DIR}/android-ndk-${TRAVIS_ANDROID_NDK_VERSION} -DCMAKE_ANDROID_NDK_TOOLCHAIN_VERSION=${TRAVIS_ANDROID_NDK_TOOLCHAIN_VERSION} -DCMAKE_ANDROID_ARCH_ABI=armeabi-v7a -DCMAKE_ANDROID_STL_TYPE=${TRAVIS_ANDROID_STL_TYPE} -DCMAKE_BUILD_TYPE=RELEASE -DCMAKE_PREFIX_PATH=${TRAVIS_BUILD_DIR}/deps -DCMAKE_LIBRARY_PATH=${TRAVIS_BUILD_DIR}/deps/lib/armeabi-v7a -DCMAKE_INSTALL_PREFIX="${TRAVIS_BUILD_DIR}/install/armeabi-v7a" .. ; fi
+  - if [ $TARGET_PLATFORM == android ]; then make install ; fi
+  - if [ $TARGET_PLATFORM == android ]; then mv ${TRAVIS_BUILD_DIR}/install/armeabi-v7a/lib ${TRAVIS_BUILD_DIR}/install/lib/armeabi-v7a ; fi
+  - if [ $TARGET_PLATFORM == android ]; then mv ${TRAVIS_BUILD_DIR}/install/armeabi-v7a/include ${TRAVIS_BUILD_DIR}/install/ ; fi
+  - if [ $TARGET_PLATFORM == android ]; then rm -rf * ; fi
   # API 19 ARCH x86
-  - if [ $TRAVIS_OS_NAME == linux ] && [ $TARGET_PLATFORM == android ]; then /usr/bin/cmake -DCMAKE_SYSTEM_NAME=Android -DCMAKE_SYSTEM_VERSION=19 -DCMAKE_ANDROID_NDK=${TRAVIS_BUILD_DIR}/android-ndk-${NDK_VERSION} -DCMAKE_ANDROID_NDK_TOOLCHAIN_VERSION=clang -DCMAKE_ANDROID_ARCH_ABI=x86 -DCMAKE_ANDROID_STL_TYPE=c++_static -DCMAKE_BUILD_TYPE=RELEASE -DCMAKE_PREFIX_PATH=${TRAVIS_BUILD_DIR}/deps -DCMAKE_LIBRARY_PATH=${TRAVIS_BUILD_DIR}/deps/lib/x86 -DCMAKE_INSTALL_PREFIX="${TRAVIS_BUILD_DIR}/install/x86" .. ; fi
-  - if [ $TRAVIS_OS_NAME == linux ] && [ $TARGET_PLATFORM == android ]; then make install ; fi
-  - if [ $TRAVIS_OS_NAME == linux ] && [ $TARGET_PLATFORM == android ]; then mv ${TRAVIS_BUILD_DIR}/install/x86/lib ${TRAVIS_BUILD_DIR}/install/lib/x86 ; fi
-  - if [ $TRAVIS_OS_NAME == linux ] && [ $TARGET_PLATFORM == android ]; then rm -rf * ; fi
+  - if [ $TARGET_PLATFORM == android ]; then /usr/bin/cmake -DCMAKE_SYSTEM_NAME=Android -DCMAKE_SYSTEM_VERSION=19 -DCMAKE_ANDROID_NDK=${TRAVIS_BUILD_DIR}/android-ndk-${TRAVIS_ANDROID_NDK_VERSION} -DCMAKE_ANDROID_NDK_TOOLCHAIN_VERSION=${TRAVIS_ANDROID_NDK_TOOLCHAIN_VERSION} -DCMAKE_ANDROID_ARCH_ABI=x86 -DCMAKE_ANDROID_STL_TYPE=${TRAVIS_ANDROID_STL_TYPE} -DCMAKE_BUILD_TYPE=RELEASE -DCMAKE_PREFIX_PATH=${TRAVIS_BUILD_DIR}/deps -DCMAKE_LIBRARY_PATH=${TRAVIS_BUILD_DIR}/deps/lib/x86 -DCMAKE_INSTALL_PREFIX="${TRAVIS_BUILD_DIR}/install/x86" .. ; fi
+  - if [ $TARGET_PLATFORM == android ]; then make install ; fi
+  - if [ $TARGET_PLATFORM == android ]; then mv ${TRAVIS_BUILD_DIR}/install/x86/lib ${TRAVIS_BUILD_DIR}/install/lib/x86 ; fi
+  - if [ $TARGET_PLATFORM == android ]; then rm -rf * ; fi
   # API 21 ARCH arm64-v8a
-  - if [ $TRAVIS_OS_NAME == linux ] && [ $TARGET_PLATFORM == android ]; then /usr/bin/cmake -DCMAKE_SYSTEM_NAME=Android -DCMAKE_SYSTEM_VERSION=21 -DCMAKE_ANDROID_NDK=${TRAVIS_BUILD_DIR}/android-ndk-${NDK_VERSION} -DCMAKE_ANDROID_NDK_TOOLCHAIN_VERSION=clang -DCMAKE_ANDROID_ARCH_ABI=arm64-v8a -DCMAKE_ANDROID_STL_TYPE=c++_static -DCMAKE_BUILD_TYPE=RELEASE -DCMAKE_PREFIX_PATH=${TRAVIS_BUILD_DIR}/deps -DCMAKE_LIBRARY_PATH=${TRAVIS_BUILD_DIR}/deps/lib/arm64-v8a -DCMAKE_INSTALL_PREFIX="${TRAVIS_BUILD_DIR}/install/arm64-v8a" .. ; fi
-  - if [ $TRAVIS_OS_NAME == linux ] && [ $TARGET_PLATFORM == android ]; then make install ; fi
-  - if [ $TRAVIS_OS_NAME == linux ] && [ $TARGET_PLATFORM == android ]; then mv ${TRAVIS_BUILD_DIR}/install/arm64-v8a/lib ${TRAVIS_BUILD_DIR}/install/lib/arm64-v8a ; fi
-  - if [ $TRAVIS_OS_NAME == linux ] && [ $TARGET_PLATFORM == android ]; then rm -rf * ; fi
+  - if [ $TARGET_PLATFORM == android ]; then /usr/bin/cmake -DCMAKE_SYSTEM_NAME=Android -DCMAKE_SYSTEM_VERSION=21 -DCMAKE_ANDROID_NDK=${TRAVIS_BUILD_DIR}/android-ndk-${TRAVIS_ANDROID_NDK_VERSION} -DCMAKE_ANDROID_NDK_TOOLCHAIN_VERSION=${TRAVIS_ANDROID_NDK_TOOLCHAIN_VERSION} -DCMAKE_ANDROID_ARCH_ABI=arm64-v8a -DCMAKE_ANDROID_STL_TYPE=${TRAVIS_ANDROID_STL_TYPE} -DCMAKE_BUILD_TYPE=RELEASE -DCMAKE_PREFIX_PATH=${TRAVIS_BUILD_DIR}/deps -DCMAKE_LIBRARY_PATH=${TRAVIS_BUILD_DIR}/deps/lib/arm64-v8a -DCMAKE_INSTALL_PREFIX="${TRAVIS_BUILD_DIR}/install/arm64-v8a" .. ; fi
+  - if [ $TARGET_PLATFORM == android ]; then make install ; fi
+  - if [ $TARGET_PLATFORM == android ]; then mv ${TRAVIS_BUILD_DIR}/install/arm64-v8a/lib ${TRAVIS_BUILD_DIR}/install/lib/arm64-v8a ; fi
+  - if [ $TARGET_PLATFORM == android ]; then rm -rf * ; fi
   # API 21 ARCH x86_64
-  - if [ $TRAVIS_OS_NAME == linux ] && [ $TARGET_PLATFORM == android ]; then /usr/bin/cmake -DCMAKE_SYSTEM_NAME=Android -DCMAKE_SYSTEM_VERSION=21 -DCMAKE_ANDROID_NDK=${TRAVIS_BUILD_DIR}/android-ndk-${NDK_VERSION} -DCMAKE_ANDROID_NDK_TOOLCHAIN_VERSION=clang -DCMAKE_ANDROID_ARCH_ABI=x86_64 -DCMAKE_ANDROID_STL_TYPE=c++_static -DCMAKE_BUILD_TYPE=RELEASE -DCMAKE_PREFIX_PATH=${TRAVIS_BUILD_DIR}/deps -DCMAKE_LIBRARY_PATH=${TRAVIS_BUILD_DIR}/deps/lib/x86_64 -DCMAKE_INSTALL_PREFIX="${TRAVIS_BUILD_DIR}/install/x86_64" .. ; fi
-  - if [ $TRAVIS_OS_NAME == linux ] && [ $TARGET_PLATFORM == android ]; then make install ; fi
-  - if [ $TRAVIS_OS_NAME == linux ] && [ $TARGET_PLATFORM == android ]; then mv ${TRAVIS_BUILD_DIR}/install/x86_64/lib ${TRAVIS_BUILD_DIR}/install/lib/x86_64 ; fi
-  - if [ $TRAVIS_OS_NAME == linux ] && [ $TARGET_PLATFORM == android ]; then rm -rf * ; fi
+  - if [ $TARGET_PLATFORM == android ]; then /usr/bin/cmake -DCMAKE_SYSTEM_NAME=Android -DCMAKE_SYSTEM_VERSION=21 -DCMAKE_ANDROID_NDK=${TRAVIS_BUILD_DIR}/android-ndk-${TRAVIS_ANDROID_NDK_VERSION} -DCMAKE_ANDROID_NDK_TOOLCHAIN_VERSION=${TRAVIS_ANDROID_NDK_TOOLCHAIN_VERSION} -DCMAKE_ANDROID_ARCH_ABI=x86_64 -DCMAKE_ANDROID_STL_TYPE=${TRAVIS_ANDROID_STL_TYPE} -DCMAKE_BUILD_TYPE=RELEASE -DCMAKE_PREFIX_PATH=${TRAVIS_BUILD_DIR}/deps -DCMAKE_LIBRARY_PATH=${TRAVIS_BUILD_DIR}/deps/lib/x86_64 -DCMAKE_INSTALL_PREFIX="${TRAVIS_BUILD_DIR}/install/x86_64" .. ; fi
+  - if [ $TARGET_PLATFORM == android ]; then make install ; fi
+  - if [ $TARGET_PLATFORM == android ]; then mv ${TRAVIS_BUILD_DIR}/install/x86_64/lib ${TRAVIS_BUILD_DIR}/install/lib/x86_64 ; fi
+  - if [ $TARGET_PLATFORM == android ]; then rm -rf * ; fi
 
   # iOS build
-  - if [ $TRAVIS_OS_NAME == osx ] && [ $TARGET_PLATFORM == ios ]; then cmake  -DCMAKE_TOOLCHAIN_FILE="${TRAVIS_BUILD_DIR}/cmake/Toolchains/ios.toolchain.cmake" -DIOS_PLATFORM="OS" -DCMAKE_BUILD_TYPE=RELEASE -DCMAKE_INSTALL_PREFIX="${TRAVIS_BUILD_DIR}/install" -DCMAKE_PREFIX_PATH="${TRAVIS_BUILD_DIR}/deps" .. ; fi
-  - if [ $TRAVIS_OS_NAME == osx ] && [ $TARGET_PLATFORM == ios ]; then make install ; fi
+  - if [ $TARGET_PLATFORM == ios ]; then cmake  -DCMAKE_TOOLCHAIN_FILE="${TRAVIS_BUILD_DIR}/cmake/Toolchains/ios.toolchain.cmake" -DIOS_PLATFORM="OS" -DCMAKE_BUILD_TYPE=RELEASE -DCMAKE_INSTALL_PREFIX="${TRAVIS_BUILD_DIR}/install" -DCMAKE_PREFIX_PATH="${TRAVIS_BUILD_DIR}/deps" .. ; fi
+  - if [ $TARGET_PLATFORM == ios ]; then make install ; fi
 
   # Linux build
-  - if [ $TRAVIS_OS_NAME == linux ] && [ $TARGET_PLATFORM == linux ]; then /usr/bin/cmake "-DCMAKE_PREFIX_PATH=${TRAVIS_BUILD_DIR}/deps" -DCMAKE_INSTALL_PREFIX="${TRAVIS_BUILD_DIR}/install" -DCMAKE_LIBRARY_PATH=${TRAVIS_BUILD_DIR}/deps/lib/x86_64 .. ; fi
-  - if [ $TRAVIS_OS_NAME == linux ] && [ $TARGET_PLATFORM == linux ]; then make ; fi
-  - if [ $TRAVIS_OS_NAME == linux ] && [ $TARGET_PLATFORM == linux ]; then make install ; fi
-  - if [ $TRAVIS_OS_NAME == linux ] && [ $TARGET_PLATFORM == linux ]; then make test ; fi
+  - if [ $TARGET_PLATFORM == linux ]; then /usr/bin/cmake "-DCMAKE_PREFIX_PATH=${TRAVIS_BUILD_DIR}/deps" -DCMAKE_INSTALL_PREFIX="${TRAVIS_BUILD_DIR}/install" -DCMAKE_LIBRARY_PATH=${TRAVIS_BUILD_DIR}/deps/lib/x86_64 .. ; fi
+  - if [ $TARGET_PLATFORM == linux ]; then make ; fi
+  - if [ $TARGET_PLATFORM == linux ]; then make install ; fi
+  - if [ $TARGET_PLATFORM == linux ]; then make test ; fi
 
   # macOS build
-  - if [ $TRAVIS_OS_NAME == osx ] && [ $TARGET_PLATFORM == macos ]; then cmake "-DCMAKE_PREFIX_PATH=${TRAVIS_BUILD_DIR}/deps" -DCMAKE_INSTALL_PREFIX="${TRAVIS_BUILD_DIR}/install" .. ; fi
-  - if [ $TRAVIS_OS_NAME == osx ] && [ $TARGET_PLATFORM == macos ]; then make ; fi
-  - if [ $TRAVIS_OS_NAME == osx ] && [ $TARGET_PLATFORM == macos ]; then make install ; fi
-  - if [ $TRAVIS_OS_NAME == osx ] && [ $TARGET_PLATFORM == macos ]; then make test ; fi
+  - if [ $TARGET_PLATFORM == macos ]; then cmake "-DCMAKE_PREFIX_PATH=${TRAVIS_BUILD_DIR}/deps" -DCMAKE_INSTALL_PREFIX="${TRAVIS_BUILD_DIR}/install" .. ; fi
+  - if [ $TARGET_PLATFORM == macos ]; then make ; fi
+  - if [ $TARGET_PLATFORM == macos ]; then make install ; fi
+  - if [ $TARGET_PLATFORM == macos ]; then make test ; fi
 
   # iOS ranlib
-  - if [ $TRAVIS_OS_NAME == osx ] && [ $TARGET_PLATFORM == ios ]; then xcrun ranlib "${TRAVIS_BUILD_DIR}/install/lib/*.a" || true ; fi
+  - if [ $TARGET_PLATFORM == ios ]; then xcrun ranlib "${TRAVIS_BUILD_DIR}/install/lib/*.a" || true ; fi
 
-  # ZIP result
+
+# ZIP result
   - cd "${TRAVIS_BUILD_DIR}/install"
-  - zip -r "${TRAVIS_BUILD_DIR}/rgpzip-${TARGET_PLATFORM}-${TRAVIS_TAG}.zip" include lib
+  - zip -r "${TRAVIS_BUILD_DIR}/rgpzip-${PLATFORM_ARTIFACT_NAME}-${TRAVIS_TAG}.zip" include lib
   - cd "${TRAVIS_BUILD_DIR}"
 
 deploy:
   provider: releases
   api_key:
     secure: "PX+2uNPt8gLzs6uMek9ycsKjezQy5Da2rJSMPwZv6SiDt3yQU4LDp/K3VKVhV4y8Uks3FtUati1kYsdz6mzaalUV6mSkFZ+wHa6YR9fWxBYndtiiAuApHX3A3rsbO6j5r0dkG7auKt1iRLZwgE+U/rDNv55j94QEb2Ey7Nvx9Bwcdursin5iO3jleLApGoqOl7cDgVf0V1TylA6H5pdr26cSHDOK5XKwix4zlQ4Bk5gtJ9zT7uEWh+JZQgTUr1t7Q8Dx0KK+Cdce/Kf+qearHJZp/qBhnkp7HMMOjC7qUfU/dr97LZeVpZ6OCsiVS+oj1YzsyGGEiJV9YhnLZa6n+gRctlLbOBFtWKEKbCGXkwWS46aDV10Crziog8hna8UuK7YJ2tTVHV7W/fXQNP9txV5JGH1dvw5/DQebYwB9VTFi34u8k43yQDPgdpTjI7slGaBxNI5hRRE+sRrT9bt/CNx7ARw6V6BbQxIEDbebno/sb+eqd8wiTFEo4J+FvwL7u89oQIni0slu+vZuHeQPLPOu8nOyv61dBVOGZnjSOS8Yz/wRBLx4o1chnLMjciR2pRk3nDE5c+b38YYT6hob/dfaS6Cz0lwqImKK+Y0rLaVuG4nKH4ASm+eKLwdx5aM+vSOKwxpXrLGY79/nhioLh9RYO8xndobzn4PSFYjye9o="
-  file: "rgpzip-${TARGET_PLATFORM}-${TRAVIS_TAG}.zip"
+  file: "rgpzip-${PLATFORM_ARTIFACT_NAME}-${TRAVIS_TAG}.zip"
   skip_cleanup: true
   on:
     branch: master

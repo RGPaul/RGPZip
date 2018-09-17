@@ -7,6 +7,7 @@ environment:
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
       platform: x64
       FLAGS: ""
+      ARTIFACT_NAME: win10-msvc14.1-mt-s
 
 init:
   - cmake --version
@@ -41,18 +42,18 @@ build_script:
 after_build:
   - ps: Get-ChildItem -Path ${env:APPVEYOR_BUILD_FOLDER}\install
   # Archive include and lib folder into a ZIP file containing the library version
-  - ps: Compress-Archive -Force -Path ${env:APPVEYOR_BUILD_FOLDER}\install\include, ${env:APPVEYOR_BUILD_FOLDER}\install\lib -DestinationPath rgpzip-win10-${env:LIBRARY_VERSION}.zip
+  - ps: Compress-Archive -Force -Path ${env:APPVEYOR_BUILD_FOLDER}\install\include, ${env:APPVEYOR_BUILD_FOLDER}\install\lib -DestinationPath rgpzip-${env:ARTIFACT_NAME}-${env:LIBRARY_VERSION}.zip
 
 artifacts:
-  - path: rgpzip-win10-*.zip
-    name: RGPZip-Win10
+  - path: rgpzip-*.zip
+    name: RGPZip-Archive
 
 deploy:
   description: 'Windows 10'
   provider: GitHub
   auth_token:
     secure: dUid+CLSKyImcMCRy/23dH9Ue11Il5K7AB1r2r3/fAQfm3Lkc7EHuIE6NH4Dw8Up
-  artifact: RGPZip-Win10
+  artifact: RGPZip-Archive
   draft: false
   prerelease: false
   tag: $(APPVEYOR_REPO_TAG_NAME)
