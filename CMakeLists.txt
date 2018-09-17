@@ -32,6 +32,14 @@ link_directories(${CMAKE_CURRENT_SOURCE_DIR}/deps/lib)
 # add local cmake modules to module path
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules/")
 
+# specify windows specific settings
+if (WIN32)
+    if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+        set(CMAKE_CXX_FLAGS_RELEASE "/MT")
+        set(CMAKE_CXX_FLAGS_DEBUG "/MTd")
+    endif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+endif (WIN32)
+
 # ----------------------------------------------------------------------------------------------------------------------
 # Dependencies
 # ----------------------------------------------------------------------------------------------------------------------
@@ -49,14 +57,27 @@ find_package(Boost 1.67.0 REQUIRED COMPONENTS system filesystem)
 # Library
 # ----------------------------------------------------------------------------------------------------------------------
 
-add_library(rgpzip STATIC
-    # minizip sources
+file(GLOB MINIZIP_SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/deps/zlib/contrib/minizip/unzip.c
     ${CMAKE_CURRENT_SOURCE_DIR}/deps/zlib/contrib/minizip/zip.c
     ${CMAKE_CURRENT_SOURCE_DIR}/deps/zlib/contrib/minizip/ioapi.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/deps/zlib/contrib/minizip/mztools.c
-    # rgpzip sources
+    ${CMAKE_CURRENT_SOURCE_DIR}/deps/zlib/contrib/minizip/mztools.c)
+
+file(GLOB RGPZIP_SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/RGPZip.cpp)
+
+if (WIN32)
+    file(GLOB MINIZIP_PLATFORM_SRC
+            ${CMAKE_CURRENT_SOURCE_DIR}/deps/zlib/contrib/minizip/iowin32.c)
+endif (WIN32)
+
+add_library(rgpzip STATIC
+    # minizip sources
+    ${MINIZIP_SRC}
+    # platform specific minizip sources
+    ${MINIZIP_PLATFORM_SRC}
+    # rgpzip sources
+    ${RGPZIP_SRC})
 
 target_include_directories(rgpzip
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/deps/zlib/contrib/minizip
