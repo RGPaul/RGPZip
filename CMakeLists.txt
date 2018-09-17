@@ -45,7 +45,11 @@ endif (WIN32)
 # ----------------------------------------------------------------------------------------------------------------------
 
 # zlibc Compressing File-I/O Library - https://www.zlib.net
-find_package(ZLIB REQUIRED)
+#if (ANDROID)
+#    find_package(ZLIB REQUIRED PATHS "${CMAKE_CURRENT_LIST_DIR}/deps/lib/${CMAKE_ANDROID_ARCH_ABI}" NO_DEFAULT_PATH)
+#else()
+    find_package(ZLIB REQUIRED)
+#endif(ANDROID)
 
 # Boost - http://www.boost.org
 set(Boost_USE_STATIC_LIBS ON )

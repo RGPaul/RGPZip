@@ -30,11 +30,13 @@ before_install:
   - curl -OL https://gist.githubusercontent.com/Manromen/4e4cf28ddf5bf2e4ee5cc2dfe4055952/raw/77d59731d3523f51d312254c6fd36427b3ea49b5/googleDriveDownload.sh
   - chmod +x googleDriveDownload.sh;
 
-  # Install Android Boost / NDK from Google Drive
+  # Install Android Boost / NDK / zlib from Google Drive
   - if [ $TRAVIS_OS_NAME == linux ] && [ $TARGET_PLATFORM == android ]; then ./googleDriveDownload.sh "1WwOce4Ci89f56a0UsvaRHS-8SpeARagj" ; fi
   - if [ $TRAVIS_OS_NAME == linux ] && [ $TARGET_PLATFORM == android ]; then unzip -q -o boost-android-r17b-15-clang-1.68.0.zip -d deps/; fi
   - if [ $TRAVIS_OS_NAME == linux ] && [ $TARGET_PLATFORM == android ]; then ./googleDriveDownload.sh "1TC5k_qcdZthAjLZOZG50iYdvzHO0n8ck" ; fi
   - if [ $TRAVIS_OS_NAME == linux ] && [ $TARGET_PLATFORM == android ]; then unzip -q -o android-ndk-r17b-linux-x86_64.zip ; fi
+  - if [ $TRAVIS_OS_NAME == linux ] && [ $TARGET_PLATFORM == android ]; then curl -L -o zlib-android-1.2.11.zip https://drive.google.com/uc\?export\=download\&id\=1f0PVBzzGDum88JvDaJa3WhS48PDTfksH ; fi
+  - if [ $TRAVIS_OS_NAME == linux ] && [ $TARGET_PLATFORM == android ]; then unzip -o zlib-android-1.2.11.zip -d deps/; fi
 
   # Install iOS Boost and zlib from Google Drive
   - if [ $TRAVIS_OS_NAME == osx ] && [ $TARGET_PLATFORM == ios ]; then ./googleDriveDownload.sh "1ILxNcA5SS9_IVtHVMXsq6rmEUdVOsJ0w" ; fi
@@ -56,12 +58,23 @@ before_install:
 matrix:
   include:
 
-    # macOS
+    # Android / clang
+    - os: linux
+      compiler: clang
+      env:
+        - TARGET_PLATFORM=android
+        - NDK_VERSION=r17b
+      addons:
+      apt:
+        sources: ['ubuntu-toolchain-r-test']
+        packages: ['g++-5' ]
+
+    # iOS
     - os: osx
       osx_image: xcode9.4
       compiler: clang
       env:
-        - TARGET_PLATFORM=macos
+        - TARGET_PLATFORM=ios
 
     # Linux / GCC
     - os: linux
@@ -73,25 +86,12 @@ matrix:
         sources: ['ubuntu-toolchain-r-test']
         packages: ['g++-5', 'ninja-build']
 
-    # iOS
+    # macOS
     - os: osx
       osx_image: xcode9.4
       compiler: clang
       env:
-        - TARGET_PLATFORM=ios
-
-
-
-    # Android / clang
-    #- os: linux
-    #  compiler: clang
-    #  env:
-    #    - TARGET_PLATFORM=android
-    #    - NDK_VERSION=r17b
-    #  addons:
-    #  apt:
-    #    sources: ['ubuntu-toolchain-r-test']
-    #    packages: ['g++-5' ]
+        - TARGET_PLATFORM=macos
 
 ### build script
 script:
