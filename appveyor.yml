@@ -48,14 +48,14 @@ artifacts:
     name: RGPZip-Win10
 
 deploy:
-  release: ${env:LIBRARY_VERSION}
   description: 'Windows 10'
   provider: GitHub
   auth_token:
     secure: dUid+CLSKyImcMCRy/23dH9Ue11Il5K7AB1r2r3/fAQfm3Lkc7EHuIE6NH4Dw8Up
-  artifact: rgpzip-win10-*.zip
+  artifact: RGPZip-Win10
   draft: false
   prerelease: false
+  tag: $(APPVEYOR_REPO_TAG_NAME)
   on:
     branch: master
-    appveyor_repo_tag: true
+

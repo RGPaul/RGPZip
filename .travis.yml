@@ -3,7 +3,7 @@
 # C++ project
 language: cpp
 
-# Use Ubuntu 14.04 (Trusty) 
+# Use Ubuntu 14.04 (Trusty)
 dist: trusty
 sudo: required
 group: edge
@@ -18,7 +18,7 @@ git:
 before_install:
 
   # Get version from git tag
-  - export LIBRARY_VERSION=$(git describe --abbrev=0 --tags)
+  - export TRAVIS_TAG=$(git describe --abbrev=0 --tags)
 
   # Install Linux Dependencies (zlib, cmake, Google Drive Downloader)
   - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get install zlib1g-dev; fi
@@ -139,5 +139,14 @@ script:
 
   # ZIP result
   - cd "${TRAVIS_BUILD_DIR}/install"
-  - zip -r "${TRAVIS_BUILD_DIR}/rgpzip-${TARGET_PLATFORM}-${LIBRARY_VERSION}.zip" include lib
+  - zip -r "${TRAVIS_BUILD_DIR}/rgpzip-${TARGET_PLATFORM}-${TRAVIS_TAG}.zip" include lib
   - cd "${TRAVIS_BUILD_DIR}"
+
+deploy:
+  provider: releases
+  api_key:
+    secure: "PX+2uNPt8gLzs6uMek9ycsKjezQy5Da2rJSMPwZv6SiDt3yQU4LDp/K3VKVhV4y8Uks3FtUati1kYsdz6mzaalUV6mSkFZ+wHa6YR9fWxBYndtiiAuApHX3A3rsbO6j5r0dkG7auKt1iRLZwgE+U/rDNv55j94QEb2Ey7Nvx9Bwcdursin5iO3jleLApGoqOl7cDgVf0V1TylA6H5pdr26cSHDOK5XKwix4zlQ4Bk5gtJ9zT7uEWh+JZQgTUr1t7Q8Dx0KK+Cdce/Kf+qearHJZp/qBhnkp7HMMOjC7qUfU/dr97LZeVpZ6OCsiVS+oj1YzsyGGEiJV9YhnLZa6n+gRctlLbOBFtWKEKbCGXkwWS46aDV10Crziog8hna8UuK7YJ2tTVHV7W/fXQNP9txV5JGH1dvw5/DQebYwB9VTFi34u8k43yQDPgdpTjI7slGaBxNI5hRRE+sRrT9bt/CNx7ARw6V6BbQxIEDbebno/sb+eqd8wiTFEo4J+FvwL7u89oQIni0slu+vZuHeQPLPOu8nOyv61dBVOGZnjSOS8Yz/wRBLx4o1chnLMjciR2pRk3nDE5c+b38YYT6hob/dfaS6Cz0lwqImKK+Y0rLaVuG4nKH4ASm+eKLwdx5aM+vSOKwxpXrLGY79/nhioLh9RYO8xndobzn4PSFYjye9o="
+  file: "rgpzip-${TARGET_PLATFORM}-${TRAVIS_TAG}.zip"
+  skip_cleanup: true
+  on:
+    branch: master
