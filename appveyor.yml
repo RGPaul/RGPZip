@@ -16,6 +16,9 @@ install:
   # get submodules
   - git submodule update --init --recursive
 
+  # store library version (via git tag) into environmental variable
+  - ps: $env:LIBRARY_VERSION = & git describe --abbrev=0 --tags
+
   # set protocol to tls version 1.2
   - ps: '[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12'
   # download google drive downloader script
@@ -33,8 +36,26 @@ build_script:
   # cmake / build / install
   - ps: cmake -G "Visual Studio 15 2017" "-DCMAKE_BUILD_TYPE=RELEASE" "-DCMAKE_PREFIX_PATH=${env:APPVEYOR_BUILD_FOLDER}/deps" "-DCMAKE_LIBRARY_PATH=${env:APPVEYOR_BUILD_FOLDER}/deps/lib/x86" "-DCMAKE_INSTALL_PREFIX=${env:APPVEYOR_BUILD_FOLDER}/install" .
   - ps: cmake --build . --target INSTALL --config Release
+  # - ps: cmake --build . --target RUN_TESTS --config Debug
+
+after_build:
+  - ps: Get-ChildItem -Path ${env:APPVEYOR_BUILD_FOLDER}\install
+  # Archive include and lib folder into a ZIP file containing the library version
+  - ps: Compress-Archive -Force -Path ${env:APPVEYOR_BUILD_FOLDER}\install\include, ${env:APPVEYOR_BUILD_FOLDER}\install\lib -DestinationPath rgpzip-win10-${env:LIBRARY_VERSION}.zip
 
 artifacts:
   - path: rgpzip-win10-*.zip
     name: RGPZip-Win10
-    type: zip
+
+deploy:
+  release: ${env:LIBRARY_VERSION}
+  description: 'Windows 10'
+  provider: GitHub
+  auth_token:
+    secure: dUid+CLSKyImcMCRy/23dH9Ue11Il5K7AB1r2r3/fAQfm3Lkc7EHuIE6NH4Dw8Up
+  artifact: rgpzip-win10-*.zip
+  draft: false
+  prerelease: false
+  on:
+    branch: master
+    appveyor_repo_tag: true
