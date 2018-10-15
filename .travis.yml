@@ -11,6 +11,7 @@ group: edge
 branches:
   only:
     - master
+    - develop
 
 git:
     submodules: true
@@ -37,14 +38,32 @@ before_install:
   - chmod +x googleDriveDownload.sh;
 
   # Install Android Boost / NDK / zlib from Google Drive
-  - if [ $TARGET_PLATFORM == android ]; then ./googleDriveDownload.sh "1WwOce4Ci89f56a0UsvaRHS-8SpeARagj" ; fi
-  - if [ $TARGET_PLATFORM == android ]; then unzip -q -o boost-android-r17b-15-clang-1.68.0.zip -d deps/; fi
-  - if [ $TRAVIS_OS_NAME == linux ] && [ $TARGET_PLATFORM == android ]; then ./googleDriveDownload.sh "1TC5k_qcdZthAjLZOZG50iYdvzHO0n8ck" ; fi
-  - if [ $TRAVIS_OS_NAME == linux ] && [ $TARGET_PLATFORM == android ]; then unzip -q -o android-ndk-r17b-linux-x86_64.zip ; fi
-  - if [ $TARGET_PLATFORM == android ]; then curl -L -o zlib-android-1.2.11.zip https://drive.google.com/uc\?export\=download\&id\=1f0PVBzzGDum88JvDaJa3WhS48PDTfksH ; fi
-  - if [ $TARGET_PLATFORM == android ]; then unzip -o zlib-android-1.2.11.zip -d deps/; fi
+  # Boost NDK r17b
+  - if [ $TRAVIS_OS_NAME == linux ] && [ $TARGET_PLATFORM == android ] && [ $TRAVIS_ANDROID_NDK_VERSION == r17b ]; then ./googleDriveDownload.sh "1WwOce4Ci89f56a0UsvaRHS-8SpeARagj" ; fi
+  - if [ $TRAVIS_OS_NAME == linux ] && [ $TARGET_PLATFORM == android ] && [ $TRAVIS_ANDROID_NDK_VERSION == r17b ]; then unzip -q -o boost-android-r17b-15-clang-1.68.0.zip -d deps/; fi
+  # Boost NDK r18
+  - if [ $TRAVIS_OS_NAME == linux ] && [ $TARGET_PLATFORM == android ] && [ $TRAVIS_ANDROID_NDK_VERSION == r18 ]; then curl -L -o boost-android-r18-arm64-v8a-1.68.0.zip https://github.com/Manromen/Boost-for-Android/releases/download/Boost-1.68.0/boost-android-r18-arm64-v8a-1.68.0.zip ; fi
+  - if [ $TRAVIS_OS_NAME == linux ] && [ $TARGET_PLATFORM == android ] && [ $TRAVIS_ANDROID_NDK_VERSION == r18 ]; then unzip -q -o boost-android-r18-arm64-v8a-1.68.0.zip -d deps/ ; fi
+  - if [ $TRAVIS_OS_NAME == linux ] && [ $TARGET_PLATFORM == android ] && [ $TRAVIS_ANDROID_NDK_VERSION == r18 ]; then curl -L -o boost-android-r18-armeabi-v7a-1.68.0.zip https://github.com/Manromen/Boost-for-Android/releases/download/Boost-1.68.0/boost-android-r18-armeabi-v7a-1.68.0.zip ; fi
+  - if [ $TRAVIS_OS_NAME == linux ] && [ $TARGET_PLATFORM == android ] && [ $TRAVIS_ANDROID_NDK_VERSION == r18 ]; then unzip -q -o boost-android-r18-armeabi-v7a-1.68.0.zip -d deps/ ; fi
+  - if [ $TRAVIS_OS_NAME == linux ] && [ $TARGET_PLATFORM == android ] && [ $TRAVIS_ANDROID_NDK_VERSION == r18 ]; then curl -L -o boost-android-r18-x86-1.68.0.zip https://github.com/Manromen/Boost-for-Android/releases/download/Boost-1.68.0/boost-android-r18-x86-1.68.0.zip ; fi
+  - if [ $TRAVIS_OS_NAME == linux ] && [ $TARGET_PLATFORM == android ] && [ $TRAVIS_ANDROID_NDK_VERSION == r18 ]; then unzip -q -o boost-android-r18-x86-1.68.0.zip -d deps/ ; fi
+  - if [ $TRAVIS_OS_NAME == linux ] && [ $TARGET_PLATFORM == android ] && [ $TRAVIS_ANDROID_NDK_VERSION == r18 ]; then curl -L -o boost-android-r18-x86_64-1.68.0.zip https://github.com/Manromen/Boost-for-Android/releases/download/Boost-1.68.0/boost-android-r18-x86_64-1.68.0.zip ; fi
+  - if [ $TRAVIS_OS_NAME == linux ] && [ $TARGET_PLATFORM == android ] && [ $TRAVIS_ANDROID_NDK_VERSION == r18 ]; then unzip -q -o boost-android-r18-x86_64-1.68.0.zip -d deps/ ; fi
+  # NDK r17b
+  - if [ $TRAVIS_OS_NAME == linux ] && [ $TARGET_PLATFORM == android ] && [ $TRAVIS_ANDROID_NDK_VERSION == r17b ]; then ./googleDriveDownload.sh "1TC5k_qcdZthAjLZOZG50iYdvzHO0n8ck" ; fi
+  - if [ $TRAVIS_OS_NAME == linux ] && [ $TARGET_PLATFORM == android ] && [ $TRAVIS_ANDROID_NDK_VERSION == r17b ]; then unzip -q -o android-ndk-r17b-linux-x86_64.zip ; fi
+  # NDK r18
+  - if [ $TRAVIS_OS_NAME == linux ] && [ $TARGET_PLATFORM == android ] && [ $TRAVIS_ANDROID_NDK_VERSION == r18 ]; then ./googleDriveDownload.sh "107fT4NP2YMDyK89xp3l6NRzPnwxrr2HT" ; fi
+  - if [ $TRAVIS_OS_NAME == linux ] && [ $TARGET_PLATFORM == android ] && [ $TRAVIS_ANDROID_NDK_VERSION == r18 ]; then unzip -q -o android-ndk-r18-linux-x86_64.zip ; fi
+  # zlib NDK r17b
+  - if [ $TRAVIS_OS_NAME == linux ] && [ $TARGET_PLATFORM == android ] && [ $TRAVIS_ANDROID_NDK_VERSION == r17b ]; then curl -L -o zlib-android-r17b-19-clang-1.2.11.zip "https://onedrive.live.com/download?cid=8269456C9AED2587&resid=8269456C9AED2587%21199253&authkey=${ONEDRIVE_AUTH_ZLIB}" ; fi
+  - if [ $TRAVIS_OS_NAME == linux ] && [ $TARGET_PLATFORM == android ] && [ $TRAVIS_ANDROID_NDK_VERSION == r17b ]; then unzip -o zlib-android-r17b-19-clang-1.2.11.zip -d deps/; fi
+  # zlib NDK r18
+  - if [ $TRAVIS_OS_NAME == linux ] && [ $TARGET_PLATFORM == android ] && [ $TRAVIS_ANDROID_NDK_VERSION == r18 ]; then curl -L -o zlib-android-r18-19-clang-1.2.11.zip "https://onedrive.live.com/download?cid=8269456C9AED2587&resid=8269456C9AED2587%21199254&authkey=${ONEDRIVE_AUTH_ZLIB}" ; fi
+  - if [ $TRAVIS_OS_NAME == linux ] && [ $TARGET_PLATFORM == android ] && [ $TRAVIS_ANDROID_NDK_VERSION == r18 ]; then unzip -o zlib-android-r18-19-clang-1.2.11.zip -d deps/; fi
 
-  # Install iOS Boost and zlib from Google Drive
+    # Install iOS Boost and zlib from Google Drive
   - if [ $TARGET_PLATFORM == ios ]; then ./googleDriveDownload.sh "1ILxNcA5SS9_IVtHVMXsq6rmEUdVOsJ0w" ; fi
   - if [ $TARGET_PLATFORM == ios ]; then unzip -q -o boost-ios-sdk11.4-clang-1.68.0.zip -d deps/; fi
   - if [ $TARGET_PLATFORM == ios ]; then curl -L -o zlib-1.2.11-ios-sdk11.4.zip https://drive.google.com/uc\?export\=download\&id\=1PWK67Q-dGGZ6GKx3qOCFw9toD7bLqmTr ; fi
@@ -64,14 +83,27 @@ before_install:
 matrix:
   include:
 
-    # Android / clang
+    # Android / clang - NDK r17b
     - os: linux
       env:
         - TARGET_PLATFORM=android
         - TRAVIS_ANDROID_NDK_VERSION=r17b
         - TRAVIS_ANDROID_NDK_TOOLCHAIN_VERSION=clang
         - TRAVIS_ANDROID_STL_TYPE=c++_static
-        #- PLATFORM_ARTIFACT_NAME=android-r17b-clang
+        - secure: "ulNXdBvENG432FP/Lj8ju7lmIsrMJxCBeaIDR5a4zfjfU1f/Uj74f/kz2uEn+CR7dQzMueX/RJro6H8UuNbzwP1evE3IayufdnYXN2yfhE5rL2yxji8SAc0qEawYU5Eh6Usg2tf11mQmB1/zHWcEszD67NeFLrpfIB+4RpMDu/YuFE3vwhDHfrVtiXhz2xb0B0PfG9p29DIY/YzmDS2fp/FhCU9WsFdl9uVlbV/5jvRmeSkZkB0BmAimc+stxXRw4Gl38HlEqyWm+y4fRrDBsHSKusQDWJAexWtpM1RB3GQGgYg7EBsKKzVKOPcpw9diIYUmfLnbTejtDT8pIhLsYcar78tOZGuzaIu5T3p4PiHRKRAeHhbUu/ELf2UC7oupMTcZ2cfST2geUhhJJX5baE+pB2GHmdxob5mmkGi9hCXN4H1U1J6G4Uf/ek7n896hJgPC6jdi0KfdDnv2zt0BszJL1HFSWGGD84sOcya465B1dHTeqFKqTvqx9m075rdiAev0HLigamEkbR7al0hTkAlwcC3jvjo5sUNcC2tK9ie0DzNJIPehv/u4+StFQ/CIZJyT5WpWSbbubkVx9RqTzFltbEwIovgV3ODq2ZUvNi+D9+d53pPe7Zp3azsBKR5ACFez1ugm9HPXuO1k0Ha6pBvhiT79AQsP0kBZJGLq69w="
+      addons:
+      apt:
+        sources: ['ubuntu-toolchain-r-test']
+        packages: ['g++-5' ]
+
+      # Android / clang - NDK r18
+    - os: linux
+      env:
+        - TARGET_PLATFORM=android
+        - TRAVIS_ANDROID_NDK_VERSION=r18
+        - TRAVIS_ANDROID_NDK_TOOLCHAIN_VERSION=clang
+        - TRAVIS_ANDROID_STL_TYPE=c++_static
+        - secure: "KhWixoYYDjLzIhTFKy4mqYdxcVd2eIeJXsnUoQhy3afYOIeNVNx8VonIfVWFT3TyO0NvC8poTmugPNB4nQBx+S+TNoRGkQa9/8bpcCO1vWsfwj94NeMc8mEMo+1Q1bBNoBAgiuGvxTeAZCvxV3L7WEHysZJ4wa9Kh4qRyEnB9NJo5thBJiPuyG/UIaHzr6zGhP54fmB0l0GgIMHn4ugvVRIz7/BYDPJNsoYdPnhci6Jgv7mG9vIR+JVo62P4ngKQAli7tKKKlFipHOV6bf/x6HpvuRsbGXace8LukU/zJwP7JPiAFYfP3i2G7emT3URRAZUVf0gmunDF/cdPUI8AWorOfRSEJL6DTZSXMKMy9r5RY5KVoj5YR8wZCrefjCYolvbUXYBJuAx/JLHwltrPrLsnLvFjlgNsBJKvKYeyMyYAwvcMwcrZbVJOW+4Lf4iV9Te486sLMgeJuLdSukmQSWp5CH7Jf94GFvUQZZYmwM3vZvze95G9knWGVvAKhTAo8u4ewaynzqU9HbvKf8YOeGlWtMQcq//D12yYW3UWifTet478YBOIThiGXX0Mtuk4fNQhHsAAI9AYWynl/CcXxDFUaqT3NxJkMZ1k11XOWKLQTILoVbEZtnlbicT0DzMAS28/FKXW+vRTgvcyrkkC0YiV/mLbejMZDsgwS1tT/Z4="
       addons:
       apt:
         sources: ['ubuntu-toolchain-r-test']
@@ -83,14 +115,12 @@ matrix:
       compiler: clang
       env:
         - TARGET_PLATFORM=ios
-        #- PLATFORM_ARTIFACT_NAME=ios-sdk$(xcodebuild -showsdks | grep iphoneos | awk '{print $4}' | sed 's/[^0-9,\.]*//g')
 
     # Linux / GCC
     - os: linux
       compiler: gcc
       env:
         - TARGET_PLATFORM=linux
-        #- PLATFORM_ARTIFACT_NAME=ubuntu-trusty
       addons:
       apt:
         sources: ['ubuntu-toolchain-r-test']
@@ -102,7 +132,6 @@ matrix:
       compiler: clang
       env:
         - TARGET_PLATFORM=macos
-        #- PLATFORM_ARTIFACT_NAME=macos-sdk$(xcodebuild -showsdks | grep macosx | awk '{print $4}' | sed 's/[^0-9,\.]*//g')
 
 ### build script
 script:
