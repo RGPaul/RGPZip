@@ -27,6 +27,8 @@ before_install:
   - if [ $TARGET_PLATFORM == linux ]; then export PLATFORM_ARTIFACT_NAME=ubuntu-trusty ; fi
   - if [ $TARGET_PLATFORM == macos ]; then export PLATFORM_ARTIFACT_NAME=macos-sdk$(xcodebuild -showsdks | grep macosx | awk '{print $4}' | sed 's/[^0-9,\.]*//g') ; fi
 
+install:
+
   # Install Linux Dependencies (zlib, cmake, Google Drive Downloader)
   - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get install zlib1g-dev; fi
   - if [ $TRAVIS_OS_NAME == linux ]; then sudo curl -L -o /root/cmake.sh https://cmake.org/files/v3.12/cmake-3.12.2-Linux-x86_64.sh; fi
@@ -63,7 +65,7 @@ before_install:
   - if [ $TRAVIS_OS_NAME == linux ] && [ $TARGET_PLATFORM == android ] && [ $TRAVIS_ANDROID_NDK_VERSION == r18 ]; then curl -L -o zlib-android-r18-19-clang-1.2.11.zip "https://onedrive.live.com/download?cid=8269456C9AED2587&resid=8269456C9AED2587%21199254&authkey=${ONEDRIVE_AUTH_ZLIB}" ; fi
   - if [ $TRAVIS_OS_NAME == linux ] && [ $TARGET_PLATFORM == android ] && [ $TRAVIS_ANDROID_NDK_VERSION == r18 ]; then unzip -o zlib-android-r18-19-clang-1.2.11.zip -d deps/; fi
 
-    # Install iOS Boost and zlib from Google Drive
+  # Install iOS Boost and zlib from Google Drive
   - if [ $TARGET_PLATFORM == ios ]; then ./googleDriveDownload.sh "1ILxNcA5SS9_IVtHVMXsq6rmEUdVOsJ0w" ; fi
   - if [ $TARGET_PLATFORM == ios ]; then unzip -q -o boost-ios-sdk11.4-clang-1.68.0.zip -d deps/; fi
   - if [ $TARGET_PLATFORM == ios ]; then curl -L -o zlib-1.2.11-ios-sdk11.4.zip https://drive.google.com/uc\?export\=download\&id\=1PWK67Q-dGGZ6GKx3qOCFw9toD7bLqmTr ; fi
