@@ -3,4 +3,4 @@
 	url = https://github.com/madler/zlib.git
 [submodule "cmake"]
 	path = cmake
-	url = https://github.com/Manromen/cmake-modules.git
+	url = https://github.com/RGPaul/cmake-modules.git
