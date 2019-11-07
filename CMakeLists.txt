@@ -1,7 +1,7 @@
 #  ---------------------------------------------------------------------------------------------------------------------
 #  The MIT License (MIT)
 #
-#  Copyright (c) 2018 Ralph-Gordon Paul. All rights reserved.
+#  Copyright (c) 2018-2019 Ralph-Gordon Paul. All rights reserved.
 #
 #  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
 #  documentation files (the "Software"), to deal in the Software without restriction, including without limitation the 
@@ -26,36 +26,47 @@ set(CMAKE_C_STANDARD 11)
 # for Visual Studio Code
 include(CMakeToolsHelpers OPTIONAL)
 
+# setup conan if conan is used
+if (EXISTS ${CMAKE_BINARY_DIR}/conan_paths.cmake)
+    include(${CMAKE_BINARY_DIR}/conan_paths.cmake)
+endif (EXISTS ${CMAKE_BINARY_DIR}/conan_paths.cmake)
+
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/deps/include)
 link_directories(${CMAKE_CURRENT_SOURCE_DIR}/deps/lib)
+
+# options
+option(BUILD_TESTS "Build test programs" ON)
 
 # add local cmake modules to module path
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules/")
 
+# disable root path for android and ios platforms
+if (${CMAKE_SYSTEM_NAME} MATCHES "^(iOS|tvOS|watchOS|Android)$")
+    set (CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
+    set (CMAKE_FIND_ROOT_PATH_MODE_LIBRARY NEVER)
+    set (CMAKE_FIND_ROOT_PATH_MODE_INCLUDE NEVER)
+endif()
+
 # specify windows specific settings
-if (WIN32)
-    if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
-        set(CMAKE_CXX_FLAGS_RELEASE "/MT")
-        set(CMAKE_CXX_FLAGS_DEBUG "/MTd")
-    endif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
-endif (WIN32)
+# if (WIN32)
+#     if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+#         set(CMAKE_CXX_FLAGS_RELEASE "/MT")
+#         set(CMAKE_CXX_FLAGS_DEBUG "/MTd")
+#     endif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+# endif (WIN32)
 
 # ----------------------------------------------------------------------------------------------------------------------
 # Dependencies
 # ----------------------------------------------------------------------------------------------------------------------
 
-# zlibc Compressing File-I/O Library - https://www.zlib.net
-#if (ANDROID)
-#    find_package(ZLIB REQUIRED PATHS "${CMAKE_CURRENT_LIST_DIR}/deps/lib/${CMAKE_ANDROID_ARCH_ABI}" NO_DEFAULT_PATH)
-#else()
-    find_package(ZLIB REQUIRED)
-#endif(ANDROID)
+# zlib Compressing File-I/O Library - https://www.zlib.net
+find_package(ZLIB REQUIRED)
 
 # Boost - http://www.boost.org
 set(Boost_USE_STATIC_LIBS ON )
 set(Boost_USE_MULTITHREADED ON)
 set(Boost_USE_STATIC_RUNTIME ON)
-find_package(Boost 1.67.0 REQUIRED COMPONENTS system filesystem)
+find_package(Boost 1.70.0 REQUIRED COMPONENTS system filesystem)
 
 # ----------------------------------------------------------------------------------------------------------------------
 # Library
@@ -113,10 +124,10 @@ install(TARGETS rgpzip
 # ----------------------------------------------------------------------------------------------------------------------
 
 # Boost Unit Tests
-find_package(Boost 1.67.0 COMPONENTS unit_test_framework)
+find_package(Boost 1.70.0 COMPONENTS unit_test_framework)
 
-# only enable unit tests if the unit test framework was found
-if(Boost_UNIT_TEST_FRAMEWORK_FOUND AND NOT IOS AND NOT ANDROID)
+# only enable unit tests if the unit test framework was found and tests are enabled
+if(Boost_UNIT_TEST_FRAMEWORK_FOUND AND BUILD_TESTS)
 
     # enable cmake testing
     enable_testing()

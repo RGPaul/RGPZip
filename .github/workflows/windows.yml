@@ -1,0 +1,107 @@
+name: Windows
+
+env:
+  BINTRAY_USER: manromen
+  CONAN_REPOSITORY: https://api.bintray.com/conan/manromen/rgpaul
+  CONAN_REPOSITORY_NAME: rgpaul
+  CONAN_USER: rgpaul
+  CONAN_CHANNEL: stable
+  CONAN_PACKAGE_NAME: rgpzip
+
+on:
+  create:
+    ref_type: tag
+
+jobs:
+
+  x86_64-Release:
+    runs-on: windows-2019
+    env:
+      GITHUB_OS_NAME: windows
+      BINTRAY_KEY: ${{ secrets.BINTRAY_KEY }}
+    steps:
+    - uses: actions/checkout@master
+      with:
+        submodules: true
+        ref: ${{ github.sha }}
+    - name: get version from tag
+      run: echo ::set-env name=LIBRARY_VERSION::$(echo ${GITHUB_REF:10})
+      shell: bash
+    - name: install and setup conan
+      run: powershell -File ${env:GITHUB_WORKSPACE}\.github\scripts\conan-setup.ps1
+      shell: powershell
+    - name: create conan packages
+      run: powershell -File ${env:GITHUB_WORKSPACE}\.github\scripts\build-windows.ps1 -ARCH x86_64 -BUILD_TYPE Release
+      shell: powershell
+    - name: deploy conan packages
+      run: powershell -File ${env:GITHUB_WORKSPACE}\.github\scripts\conan-deploy.ps1
+      shell: powershell
+
+  x86_64-Debug:
+    runs-on: windows-2019
+    env:
+      GITHUB_OS_NAME: windows
+      BINTRAY_KEY: ${{ secrets.BINTRAY_KEY }}
+    steps:
+    - uses: actions/checkout@master
+      with:
+        submodules: true
+        ref: ${{ github.sha }}
+    - name: get version from tag
+      run: echo ::set-env name=LIBRARY_VERSION::$(echo ${GITHUB_REF:10})
+      shell: bash
+    - name: install and setup conan
+      run: powershell -File ${env:GITHUB_WORKSPACE}\.github\scripts\conan-setup.ps1
+      shell: powershell
+    - name: create conan packages
+      run: powershell -File ${env:GITHUB_WORKSPACE}\.github\scripts\build-windows.ps1 -ARCH x86_64 -BUILD_TYPE Debug
+      shell: powershell
+    - name: deploy conan packages
+      run: powershell -File ${env:GITHUB_WORKSPACE}\.github\scripts\conan-deploy.ps1
+      shell: powershell
+
+  x86-Release:
+    runs-on: windows-2019
+    env:
+      GITHUB_OS_NAME: windows
+      BINTRAY_KEY: ${{ secrets.BINTRAY_KEY }}
+    steps:
+    - uses: actions/checkout@master
+      with:
+        submodules: true
+        ref: ${{ github.sha }}
+    - name: get version from tag
+      run: echo ::set-env name=LIBRARY_VERSION::$(echo ${GITHUB_REF:10})
+      shell: bash
+    - name: install and setup conan
+      run: powershell -File ${env:GITHUB_WORKSPACE}\.github\scripts\conan-setup.ps1
+      shell: powershell
+    - name: create conan packages
+      run: powershell -File ${env:GITHUB_WORKSPACE}\.github\scripts\build-windows.ps1 -ARCH x86 -BUILD_TYPE Release
+      shell: powershell
+    - name: deploy conan packages
+      run: powershell -File ${env:GITHUB_WORKSPACE}\.github\scripts\conan-deploy.ps1
+      shell: powershell
+
+  x86-Debug:
+    runs-on: windows-2019
+    env:
+      GITHUB_OS_NAME: windows
+      BINTRAY_KEY: ${{ secrets.BINTRAY_KEY }}
+    steps:
+    - uses: actions/checkout@master
+      with:
+        submodules: true
+        ref: ${{ github.sha }}
+    - name: get version from tag
+      run: echo ::set-env name=LIBRARY_VERSION::$(echo ${GITHUB_REF:10})
+      shell: bash
+    - name: install and setup conan
+      run: powershell -File ${env:GITHUB_WORKSPACE}\.github\scripts\conan-setup.ps1
+      shell: powershell
+    - name: create conan packages
+      run: powershell -File ${env:GITHUB_WORKSPACE}\.github\scripts\build-windows.ps1 -ARCH x86 -BUILD_TYPE Debug
+      shell: powershell
+    - name: deploy conan packages
+      run: powershell -File ${env:GITHUB_WORKSPACE}\.github\scripts\conan-deploy.ps1
+      shell: powershell

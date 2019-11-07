@@ -1,0 +1,53 @@
+name: Linux
+
+env:
+  BINTRAY_USER: manromen
+  CONAN_REPOSITORY: https://api.bintray.com/conan/manromen/rgpaul
+  CONAN_REPOSITORY_NAME: rgpaul
+  CONAN_USER: rgpaul
+  CONAN_CHANNEL: stable
+  CONAN_PACKAGE_NAME: rgpzip
+
+on:
+  create:
+    ref_type: tag
+
+jobs:
+  
+  x86_64-Release:
+    runs-on: ubuntu-18.04
+    env:
+      GITHUB_OS_NAME: linux
+      BINTRAY_KEY: ${{ secrets.BINTRAY_KEY }}
+    steps:
+    - uses: actions/checkout@master
+      with:
+        submodules: true
+        ref: ${{ github.sha }}
+    - name: get version from tag
+      run: echo ::set-env name=LIBRARY_VERSION::$(echo ${GITHUB_REF:10})
+    - name: install and setup conan
+      run: ${GITHUB_WORKSPACE}/.github/scripts/conan-setup.sh
+    - name: create conan packages
+      run: ${GITHUB_WORKSPACE}/.github/scripts/build-linux.sh x86_64 Release
+    - name: deploy conan packages
+      run: ${GITHUB_WORKSPACE}/.github/scripts/conan-deploy.sh
+
+  x86_64-Debug:
+    runs-on: ubuntu-18.04
+    env:
+      GITHUB_OS_NAME: linux
+      BINTRAY_KEY: ${{ secrets.BINTRAY_KEY }}
+    steps:
+    - uses: actions/checkout@master
+      with:
+        submodules: true
+        ref: ${{ github.sha }}
+    - name: get version from tag
+      run: echo ::set-env name=LIBRARY_VERSION::$(echo ${GITHUB_REF:10})
+    - name: install and setup conan
+      run: ${GITHUB_WORKSPACE}/.github/scripts/conan-setup.sh
+    - name: create conan packages
+      run: ${GITHUB_WORKSPACE}/.github/scripts/build-linux.sh x86_64 Debug
+    - name: deploy conan packages
+      run: ${GITHUB_WORKSPACE}/.github/scripts/conan-deploy.sh

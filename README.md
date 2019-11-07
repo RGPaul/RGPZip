@@ -1,6 +1,8 @@
-[![Build Status](https://travis-ci.org/Manromen/RGPZip.svg?branch=master)](https://travis-ci.org/Manromen/RGPZip)
-[![Build Status](https://ci.appveyor.com/api/projects/status/ykyhhws4osg4hyxp/branch/master?svg=true)](https://ci.appveyor.com/project/Manromen/rgpzip)
-[![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/Manromen/RGPZip/master/LICENSE)
+![Android status](https://github.com/rgpaul/RGPZip/workflows/Android/badge.svg)
+![iOS status](https://github.com/rgpaul/RGPZip/workflows/iOS/badge.svg)
+![Linux status](https://github.com/rgpaul/RGPZip/workflows/Linux/badge.svg)
+![macOS status](https://github.com/rgpaul/RGPZip/workflows/macOS/badge.svg)
+![Windows status](https://github.com/rgpaul/RGPZip/workflows/Windows/badge.svg)
 
 # RGPZip
 

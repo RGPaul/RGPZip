@@ -22,7 +22,7 @@
 #pragma once
 
 // This is the global package copyright
-#define LIBRGPZIP_COPYRIGHT "2018 Ralph-Gordon Paul."
+#define LIBRGPZIP_COPYRIGHT "2018-2019 Ralph-Gordon Paul."
 
 // This is the version number of librgpzip
 #define LIBRGPZIP_VERSION "1.0.1"
