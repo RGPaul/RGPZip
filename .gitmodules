@@ -1,6 +1,6 @@
 [submodule "deps/zlib"]
 	path = deps/zlib
 	url = https://github.com/madler/zlib.git
-[submodule "cmake"]
-	path = cmake
+[submodule "cmake-modules"]
+	path = cmake-modules
 	url = https://github.com/RGPaul/cmake-modules.git
